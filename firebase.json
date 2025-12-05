@@ -1,0 +1,38 @@
+{
+  "firestore": {
+    "rules": "apps/app/firestore.rules",
+    "indexes": "apps/app/firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "apps/app/storage.rules"
+  },
+  "hosting": [
+    {
+      "target": "landing",
+      "public": "apps/landing/out",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          ]
+        },
+        {
+          "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|ico)",
+          "headers": [
+            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "app",
+      "public": "apps/app/out",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        { "source": "**", "destination": "/index.html" }
+      ]
+    }
+  ]
+}

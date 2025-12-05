@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "atamagri-cc5c1"
+  },
+  "targets": {
+    "atamagri-cc5c1": {
+      "hosting": {
+        "landing": ["atamagri-cc5c1"],
+        "app": ["atamagri-cc5c1-app"]
+      }
+    }
+  }
+}

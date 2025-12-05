@@ -1,0 +1,53 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < 10 * 1024 * 1024; // Max 10MB
+    }
+    
+    function isValidAudio() {
+      return request.resource.contentType.matches('audio/.*')
+        && request.resource.size < 25 * 1024 * 1024; // Max 25MB
+    }
+    
+    // User profile images
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isValidImage();
+    }
+    
+    // Voice recordings
+    match /users/{userId}/voice/{fileName} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidAudio();
+    }
+    
+    // OCR images (receipts, invoices)
+    match /users/{userId}/ocr/{fileName} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidImage();
+    }
+    
+    // Generated content (posters, etc.)
+    match /users/{userId}/content/{fileName} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidImage();
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

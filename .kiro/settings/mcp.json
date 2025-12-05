@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "firebase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firebase-tools@latest",
+        "mcp",
+        "--dir",
+        "D:\\UMPHNEN",
+        "--only",
+        "auth,firestore,storage,functions,messaging"
+      ],
+      "env": {
+        "FIREBASE_PROJECT": "atamagri-cc5c1"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "Context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "ctx7sk-319e15cc-15b1-4292-ab7d-a70764a4a971"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": ["resolve-library-id", "get-library-docs"]
+    }
+  }
+}

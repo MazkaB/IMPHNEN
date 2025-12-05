@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #166534;
+  --color-primary-light: #22c55e;
+  --color-secondary: #78350f;
+  --color-secondary-light: #a16207;
+  --color-accent: #ea580c;
+  --color-text: #171717;
+  --color-text-muted: #525252;
+  --color-bg: #ffffff;
+  --color-bg-subtle: #fafaf9;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  z-index: 100;
+  border-radius: 0 0 6px 6px;
+  font-weight: 500;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #14532d;
+    --color-text: #000000;
+  }
+}
+
+/* Animation for TTS indicator */
+@keyframes pulse-bar {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+
+.animate-pulse-bar {
+  animation: pulse-bar 0.8s ease-in-out infinite;
+}
+
+/* Focus visible improvements for accessibility */
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High visibility mode toggle */
+.high-visibility {
+  font-size: 1.25rem !important;
+  letter-spacing: 0.025em;
+}
+
+.high-visibility * {
+  font-size: inherit;
+}

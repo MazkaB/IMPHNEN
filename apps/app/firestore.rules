@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidTransaction() {
+      let data = request.resource.data;
+      return data.type in ['income', 'expense']
+        && data.amount is number
+        && data.amount > 0
+        && data.description is string
+        && data.description.size() > 0
+        && data.category is string;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can only read/write their own profile
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false; // Prevent accidental deletion
+    }
+    
+    // Transactions collection
+    match /transactions/{transactionId} {
+      // Users can only access their own transactions
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && isValidTransaction();
+      
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+      
+      allow delete: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+    }
+    
+    // Voice inputs collection
+    match /voiceInputs/{inputId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid;
+      
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow delete: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+    }
+    
+    // WhatsApp messages collection (server-side only)
+    match /whatsappMessages/{messageId} {
+      allow read, write: if false; // Only accessible via Admin SDK
+    }
+    
+    // OCR results collection
+    match /ocrResults/{resultId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+    }
+    
+    // Generated content collection
+    match /generatedContent/{contentId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

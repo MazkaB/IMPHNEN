@@ -1,0 +1,29 @@
+{
+  "name": "nusa-ai-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev:landing": "turbo dev --filter=landing",
+    "dev:main": "turbo dev --filter=app",
+    "dev:ocr": "turbo dev --filter=ocr",
+    "dev:insight": "turbo dev --filter=insight",
+    "dev:content": "turbo dev --filter=content",
+    "build:landing": "turbo build --filter=landing",
+    "build:app": "turbo build --filter=app",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  },
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=20"
+  }
+}
