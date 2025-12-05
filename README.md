@@ -351,12 +351,11 @@ python main.py
 
 | Nama | Role | Kontribusi |
 |------|------|------------|
-| **Landing** | Frontend | Landing Page, UI/UX |
 | **Mazka** | Full Stack | Main App, Auth, Voice AI |
 | **Fattah** | Backend | OCR Service, Digitalisasi |
 | **Pancar** | Data | Dashboard Insight, Analytics |
 | **Agung** | AI/ML | Content Creator, Gemini AI |
-| **Sweetie** | QA/Design | Testing, Video, Desain |
+| **Ima** | QA/Design | Testing, Video, Desain |
 
 ---
 
