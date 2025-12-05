@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getLoginUrl, getRegisterUrl } from '@/lib/urls';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,13 +43,13 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-4">
             <Link
-              href="http://localhost:3001/login"
+              href={getLoginUrl()}
               className="text-sm font-medium text-neutral-700 hover:text-green-700 transition-colors px-4 py-2"
             >
               Masuk
             </Link>
             <Link
-              href="http://localhost:3001/register"
+              href={getRegisterUrl()}
               className="text-sm font-medium text-white bg-green-700 hover:bg-green-800 px-5 py-2.5 rounded-lg transition-colors"
             >
               Mulai Gratis
@@ -81,8 +82,8 @@ export function Navbar() {
               <a href="#harga" onClick={() => setIsOpen(false)} className="px-4 py-3 text-neutral-700 hover:bg-neutral-50 rounded-lg">Harga</a>
               <a href="#faq" onClick={() => setIsOpen(false)} className="px-4 py-3 text-neutral-700 hover:bg-neutral-50 rounded-lg">FAQ</a>
               <hr className="my-2 border-neutral-200" />
-              <Link href="http://localhost:3001/login" className="px-4 py-3 text-neutral-700 hover:bg-neutral-50 rounded-lg">Masuk</Link>
-              <Link href="http://localhost:3001/register" className="mx-4 py-3 text-center text-white bg-green-700 rounded-lg">Mulai Gratis</Link>
+              <Link href={getLoginUrl()} className="px-4 py-3 text-neutral-700 hover:bg-neutral-50 rounded-lg">Masuk</Link>
+              <Link href={getRegisterUrl()} className="mx-4 py-3 text-center text-white bg-green-700 rounded-lg">Mulai Gratis</Link>
             </div>
           </div>
         )}

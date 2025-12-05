@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
-import { logoutUser } from '@/lib/firebase/auth-service';
+import { logout } from '@/lib/firebase/auth-service';
 import { Button } from '@/components/ui/Button';
 import {
   Menu,
@@ -33,7 +33,7 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
+      await logout();
       router.push('/');
     } catch (error) {
       console.error('Logout error:', error);

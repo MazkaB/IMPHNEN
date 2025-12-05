@@ -38,9 +38,10 @@ async function verifyAuthToken(request: NextRequest): Promise<string | null> {
 // GET - Get single transaction
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const userId = await verifyAuthToken(request);
     
     if (!userId) {
@@ -50,7 +51,7 @@ export async function GET(
       );
     }
 
-    const transaction = await getTransaction(params.id);
+    const transaction = await getTransaction(id);
 
     if (!transaction) {
       return NextResponse.json(
@@ -80,9 +81,10 @@ export async function GET(
 // PATCH - Update transaction
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const userId = await verifyAuthToken(request);
     
     if (!userId) {
@@ -93,7 +95,7 @@ export async function PATCH(
     }
 
     // Verify ownership
-    const existingTransaction = await getTransaction(params.id);
+    const existingTransaction = await getTransaction(id);
     
     if (!existingTransaction) {
       return NextResponse.json(
@@ -125,7 +127,7 @@ export async function PATCH(
       );
     }
 
-    await updateTransaction(params.id, validationResult.data);
+    await updateTransaction(id, validationResult.data);
 
     return NextResponse.json({
       success: true,
@@ -143,9 +145,10 @@ export async function PATCH(
 // DELETE - Delete transaction
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const userId = await verifyAuthToken(request);
     
     if (!userId) {
@@ -156,7 +159,7 @@ export async function DELETE(
     }
 
     // Verify ownership
-    const existingTransaction = await getTransaction(params.id);
+    const existingTransaction = await getTransaction(id);
     
     if (!existingTransaction) {
       return NextResponse.json(
@@ -172,7 +175,7 @@ export async function DELETE(
       );
     }
 
-    await deleteTransaction(params.id);
+    await deleteTransaction(id);
 
     return NextResponse.json({
       success: true,

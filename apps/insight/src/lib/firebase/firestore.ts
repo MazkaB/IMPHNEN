@@ -1,4 +1,9 @@
-limit,
+import {
+    collection,
+    query,
+    where,
+    orderBy,
+    limit,
     getDocs,
     addDoc,
     updateDoc,
@@ -47,6 +52,10 @@ export function subscribeToTransactions(
         throw new Error('User ID tidak boleh kosong');
     }
 
+    if (!db) {
+        throw new Error('Firebase belum dikonfigurasi');
+    }
+
     const constraints: QueryConstraint[] = [
         where('userId', '==', userId),
         where('date', '>=', Timestamp.fromDate(startDate)),
@@ -87,6 +96,9 @@ export function subscribeToTransactions(
  */
 export async function addTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> & { userId: string }) {
     try {
+        if (!db) {
+            throw new Error('Firebase belum dikonfigurasi');
+        }
         if (!transaction.userId) {
             throw new Error('userId is required when adding a transaction');
         }
@@ -114,6 +126,9 @@ export function subscribeToProducts(
 ): () => void {
     if (!userId) {
         throw new Error('User ID tidak boleh kosong');
+    }
+    if (!db) {
+        throw new Error('Firebase belum dikonfigurasi');
     }
 
     const q = query(
@@ -152,6 +167,9 @@ export function subscribeToProducts(
  */
 export async function addProduct(product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'> & { userId: string }) {
     try {
+        if (!db) {
+            throw new Error('Firebase belum dikonfigurasi');
+        }
         if (!product.userId) {
             throw new Error('userId is required when adding a product');
         }
@@ -173,6 +191,9 @@ export async function addProduct(product: Omit<Product, 'id' | 'createdAt' | 'up
  */
 export async function updateProduct(productId: string, productData: Partial<Product>) {
     try {
+        if (!db) {
+            throw new Error('Firebase belum dikonfigurasi');
+        }
         const productRef = doc(db, 'products', productId);
         await updateDoc(productRef, {
             ...productData,
@@ -189,6 +210,9 @@ export async function updateProduct(productId: string, productData: Partial<Prod
  */
 export async function deleteProduct(productId: string) {
     try {
+        if (!db) {
+            throw new Error('Firebase belum dikonfigurasi');
+        }
         const productRef = doc(db, 'products', productId);
         await deleteDoc(productRef);
     } catch (error) {
@@ -207,6 +231,9 @@ export function subscribeToAccountsReceivable(
 ): () => void {
     if (!userId) {
         throw new Error('User ID tidak boleh kosong');
+    }
+    if (!db) {
+        throw new Error('Firebase belum dikonfigurasi');
     }
 
     const q = query(
@@ -250,6 +277,9 @@ export function subscribeToAccountsPayable(
 ): () => void {
     if (!userId) {
         throw new Error('User ID tidak boleh kosong');
+    }
+    if (!db) {
+        throw new Error('Firebase belum dikonfigurasi');
     }
 
     const q = query(

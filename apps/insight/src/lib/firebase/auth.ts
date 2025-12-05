@@ -1,3 +1,15 @@
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut as firebaseSignOut,
+    onAuthStateChanged,
+    updateProfile,
+    User,
+    UserCredential,
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from './config';
+
 /**
  * Sign up dengan email dan password
  */

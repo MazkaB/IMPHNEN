@@ -46,7 +46,7 @@ export default function DashboardPage() {
 
   const fetchSummary = async () => {
     try {
-      const userId = auth.currentUser?.uid;
+      const userId = auth?.currentUser?.uid;
       if (!userId) return;
 
       const data = await getTransactionSummary(userId);

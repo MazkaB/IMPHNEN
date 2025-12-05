@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { registerUser } from '@/lib/firebase/auth-service';
+import { registerWithEmail } from '@/lib/firebase/auth-service';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -62,7 +62,7 @@ export function RegisterForm() {
     setIsLoading(true);
 
     try {
-      await registerUser(
+      await registerWithEmail(
         formData.email,
         formData.password,
         formData.displayName,

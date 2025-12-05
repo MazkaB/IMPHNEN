@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginUser, resetPassword } from '@/lib/firebase/auth-service';
+import { loginWithEmail, sendPasswordReset } from '@/lib/firebase/auth-service';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -23,7 +23,7 @@ export function LoginForm() {
     setIsLoading(true);
 
     try {
-      await loginUser(email, password);
+      await loginWithEmail(email, password);
       router.push('/dashboard');
     } catch (err: unknown) {
       console.error('Login error:', err);
@@ -54,7 +54,7 @@ export function LoginForm() {
     setError(null);
 
     try {
-      await resetPassword(email);
+      await sendPasswordReset(email);
       setResetSent(true);
     } catch (err) {
       console.error('Reset password error:', err);

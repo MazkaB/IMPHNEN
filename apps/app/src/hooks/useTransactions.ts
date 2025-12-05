@@ -29,7 +29,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
     setError(null);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await auth?.currentUser?.getIdToken();
       
       if (!token) {
         throw new Error('Tidak terautentikasi');
@@ -62,7 +62,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
       setError(null);
 
       try {
-        const token = await auth.currentUser?.getIdToken();
+        const token = await auth?.currentUser?.getIdToken();
         
         if (!token) {
           throw new Error('Tidak terautentikasi');
@@ -87,7 +87,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
         const newTransaction: Transaction = {
           ...data,
           id: result.data.id,
-          userId: auth.currentUser!.uid,
+          userId: auth?.currentUser?.uid || '',
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -112,7 +112,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
       setError(null);
 
       try {
-        const token = await auth.currentUser?.getIdToken();
+        const token = await auth?.currentUser?.getIdToken();
         
         if (!token) {
           throw new Error('Tidak terautentikasi');
@@ -151,7 +151,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
       setError(null);
 
       try {
-        const token = await auth.currentUser?.getIdToken();
+        const token = await auth?.currentUser?.getIdToken();
         
         if (!token) {
           throw new Error('Tidak terautentikasi');
@@ -183,7 +183,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
   );
 
   useEffect(() => {
-    if (autoFetch && auth.currentUser) {
+    if (autoFetch && auth?.currentUser) {
       fetchTransactions();
     }
   }, [autoFetch, fetchTransactions]);

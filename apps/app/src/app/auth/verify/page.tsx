@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { verifyEmail, verifyLoginLink, checkIsSignInLink } from '@/lib/firebase/auth-service';
 
-export default function VerifyPage() {
+function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'email-input'>('loading');
@@ -27,13 +27,14 @@ export default function VerifyPage() {
             setMessage('Login berhasil! Mengalihkan ke dashboard...');
             setTimeout(() => router.push('/dashboard'), 2000);
           }
-        } catch (err: any) {
-          if (err.message.includes('Email tidak ditemukan')) {
+        } catch (err: unknown) {
+          const error = err as Error;
+          if (error.message?.includes('Email tidak ditemukan')) {
             setStatus('email-input');
             setMessage('Masukkan email yang Anda gunakan untuk login.');
           } else {
             setStatus('error');
-            setMessage(err.message || 'Link tidak valid atau sudah kadaluarsa.');
+            setMessage(error.message || 'Link tidak valid atau sudah kadaluarsa.');
           }
         }
         return;
@@ -45,7 +46,7 @@ export default function VerifyPage() {
           await verifyEmail(oobCode);
           setStatus('success');
           setMessage('Email berhasil diverifikasi! Anda sekarang bisa login.');
-        } catch (err: any) {
+        } catch {
           setStatus('error');
           setMessage('Link verifikasi tidak valid atau sudah kadaluarsa.');
         }
@@ -65,11 +66,11 @@ export default function VerifyPage() {
     handleVerification();
   }, [searchParams, router]);
 
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
-    // Save email and retry
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('emailForSignIn', email);
     }
@@ -81,9 +82,10 @@ export default function VerifyPage() {
         setMessage('Login berhasil! Mengalihkan ke dashboard...');
         setTimeout(() => router.push('/dashboard'), 2000);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       setStatus('error');
-      setMessage(err.message || 'Gagal verifikasi.');
+      setMessage(error.message || 'Gagal verifikasi.');
     }
   };
 
@@ -162,5 +164,24 @@ export default function VerifyPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-neutral-600">Memuat...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <VerifyContent />
+    </Suspense>
   );
 }

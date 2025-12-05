@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Image, Instagram, MessageCircle, Video, ArrowRight, Sparkles, Home } from 'lucide-react';
+import { getDashboardUrl } from '@/lib/urls';
 
 export default function ContentHomePage() {
   return (
@@ -19,7 +20,7 @@ export default function ContentHomePage() {
             </div>
           </Link>
           <Link 
-            href="http://localhost:3001/dashboard"
+            href={getDashboardUrl()}
             className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
           >
             <Home className="w-4 h-4 sm:w-5 sm:h-5" />

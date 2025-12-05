@@ -57,7 +57,7 @@ export default function SalesTrendChart({ data, loading }: SalesTrendChartProps)
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
-                            tickFormatter={(value) => {
+                            tickFormatter={(value: string) => {
                                 // Value is "dd MMM", take only "dd"
                                 return value.split(' ')[0];
                             }}
@@ -74,7 +74,7 @@ export default function SalesTrendChart({ data, loading }: SalesTrendChartProps)
                             tickLine={false}
                             axisLine={false}
                             label={{ value: 'Rupiah', angle: -90, position: 'insideLeft', style: { fill: 'hsl(var(--muted-foreground))', fontSize: 12 } }}
-                            tickFormatter={(value) => {
+                            tickFormatter={(value: number) => {
                                 if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}Jt`;
                                 if (value >= 1_000) return `${(value / 1_000).toFixed(0)}`;
                                 return value.toString();

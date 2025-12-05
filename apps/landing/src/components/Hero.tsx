@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { getRegisterUrl } from '@/lib/urls';
 
 export function Hero() {
   return (
@@ -28,7 +29,7 @@ export function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
             <Link
-              href="http://localhost:3001/register"
+              href={getRegisterUrl()}
               className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 bg-green-700 hover:bg-green-800 text-white font-medium rounded-lg transition-colors text-sm sm:text-base"
             >
               Mulai Sekarang

@@ -1,11 +1,11 @@
 // Firebase exports
-export { firebase, auth, db, storage } from './config';
+export { app, auth, db, storage } from './config';
 export { getAdminFirebase, adminAuth, adminDb } from './admin';
 export {
-  registerUser,
-  loginUser,
-  logoutUser,
-  resetPassword,
+  registerWithEmail,
+  loginWithEmail,
+  logout,
+  sendPasswordReset,
   getUserProfile,
   updateUserProfile,
   onAuthChange,

@@ -40,7 +40,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
     setIsLoading(true);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await auth?.currentUser?.getIdToken();
       
       if (!token) {
         throw new Error('Tidak terautentikasi');

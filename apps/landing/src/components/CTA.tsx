@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { getRegisterUrl } from '@/lib/urls';
 
 export function CTA() {
   return (
@@ -37,7 +38,7 @@ export function CTA() {
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <Link
-            href="http://localhost:3001/register"
+            href={getRegisterUrl()}
             className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors text-base sm:text-lg"
           >
             Mulai Sekarang

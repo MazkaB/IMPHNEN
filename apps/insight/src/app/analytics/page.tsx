@@ -210,14 +210,14 @@ export default function AnalyticsPage() {
                                         tickLine={false}
                                         axisLine={false}
                                         label={{ value: 'Rupiah', angle: -90, position: 'insideLeft', style: { fill: 'hsl(var(--muted-foreground))', fontSize: 12 } }}
-                                        tickFormatter={(value) => {
+                                        tickFormatter={(value: number) => {
                                             if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}Jt`;
                                             if (value >= 1_000) return `${(value / 1_000).toFixed(0)}`;
                                             return value.toString();
                                         }}
                                     />
                                     <Tooltip
-                                        formatter={(value) => formatCurrency(value as number)}
+                                        formatter={(value: number) => formatCurrency(value)}
                                         contentStyle={{
                                             backgroundColor: 'hsl(var(--popover))',
                                             border: '1px solid hsl(var(--border))',
@@ -246,14 +246,14 @@ export default function AnalyticsPage() {
                                         tickLine={false}
                                         axisLine={false}
                                         label={{ value: 'Rupiah', angle: -90, position: 'insideLeft', style: { fill: 'hsl(var(--muted-foreground))', fontSize: 12 } }}
-                                        tickFormatter={(value) => {
+                                        tickFormatter={(value: number) => {
                                             if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}Jt`;
                                             if (value >= 1_000) return `${(value / 1_000).toFixed(0)}`;
                                             return value.toString();
                                         }}
                                     />
                                     <Tooltip
-                                        formatter={(value) => formatCurrency(value as number)}
+                                        formatter={(value: number) => formatCurrency(value)}
                                         contentStyle={{
                                             backgroundColor: 'hsl(var(--popover))',
                                             border: '1px solid hsl(var(--border))',

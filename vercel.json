@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "npx turbo build --filter=content",
+  "outputDirectory": "apps/content/.next",
+  "framework": "nextjs",
+  "installCommand": "npm install"
+}

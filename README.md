@@ -270,8 +270,12 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
-# App URL
-NEXT_PUBLIC_APP_URL=http://localhost:3001
+# App URLs - Cross-app navigation (Production)
+NEXT_PUBLIC_APP_URL=https://nusa-app-khaki.vercel.app
+NEXT_PUBLIC_LANDING_URL=https://nusa-landing-delta.vercel.app
+NEXT_PUBLIC_INSIGHT_URL=https://nusa-insight.vercel.app
+NEXT_PUBLIC_OCR_URL=https://nusa-ocr.vercel.app
+NEXT_PUBLIC_CONTENT_URL=https://nusa-content.vercel.app
 ```
 
 ### Step 4: Setup OCR Service (Optional)

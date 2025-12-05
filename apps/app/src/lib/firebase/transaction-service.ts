@@ -19,11 +19,17 @@ import { Transaction, TransactionType } from '@/types';
 const TRANSACTIONS_COLLECTION = 'transactions';
 const USERS_COLLECTION = 'users';
 
+// Helper to ensure db is initialized
+const getDb = () => {
+  if (!db) throw new Error('Firebase Firestore belum diinisialisasi');
+  return db;
+};
+
 // Save new transaction
 export const saveTransaction = async (
   transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
-  const docRef = await addDoc(collection(db, TRANSACTIONS_COLLECTION), {
+  const docRef = await addDoc(collection(getDb(), TRANSACTIONS_COLLECTION), {
     ...transaction,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -34,7 +40,7 @@ export const saveTransaction = async (
 
 // Get transaction by ID
 export const getTransaction = async (id: string): Promise<Transaction | null> => {
-  const docRef = doc(db, TRANSACTIONS_COLLECTION, id);
+  const docRef = doc(getDb(), TRANSACTIONS_COLLECTION, id);
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) {
@@ -56,7 +62,7 @@ export const getUserTransactions = async (
   limitCount: number = 100
 ): Promise<Transaction[]> => {
   const q = query(
-    collection(db, TRANSACTIONS_COLLECTION),
+    collection(getDb(), TRANSACTIONS_COLLECTION),
     where('userId', '==', userId),
     orderBy('createdAt', 'desc'),
     limit(limitCount)
@@ -82,7 +88,7 @@ export const getTransactionsByDateRange = async (
   endDate: Date
 ): Promise<Transaction[]> => {
   const q = query(
-    collection(db, TRANSACTIONS_COLLECTION),
+    collection(getDb(), TRANSACTIONS_COLLECTION),
     where('userId', '==', userId),
     where('createdAt', '>=', Timestamp.fromDate(startDate)),
     where('createdAt', '<=', Timestamp.fromDate(endDate)),
@@ -107,7 +113,7 @@ export const updateTransaction = async (
   id: string,
   data: Partial<Transaction>
 ): Promise<void> => {
-  const docRef = doc(db, TRANSACTIONS_COLLECTION, id);
+  const docRef = doc(getDb(), TRANSACTIONS_COLLECTION, id);
   
   await updateDoc(docRef, {
     ...data,
@@ -117,7 +123,7 @@ export const updateTransaction = async (
 
 // Delete transaction
 export const deleteTransaction = async (id: string): Promise<void> => {
-  const docRef = doc(db, TRANSACTIONS_COLLECTION, id);
+  const docRef = doc(getDb(), TRANSACTIONS_COLLECTION, id);
   await deleteDoc(docRef);
 };
 
@@ -163,7 +169,7 @@ export const getUserByWhatsApp = async (
   const cleanNumber = whatsappNumber.replace('whatsapp:', '');
   
   const q = query(
-    collection(db, USERS_COLLECTION),
+    collection(getDb(), USERS_COLLECTION),
     where('whatsappNumber', '==', cleanNumber),
     limit(1)
   );
@@ -174,9 +180,9 @@ export const getUserByWhatsApp = async (
     return null;
   }
 
-  const doc = querySnapshot.docs[0];
+  const docSnap = querySnapshot.docs[0];
   return {
-    id: doc.id,
+    id: docSnap.id,
     whatsappNumber: cleanNumber,
   };
 };
@@ -190,7 +196,7 @@ export const linkWhatsAppToUser = async (
   
   // Find user by email
   const q = query(
-    collection(db, USERS_COLLECTION),
+    collection(getDb(), USERS_COLLECTION),
     where('email', '==', email.toLowerCase()),
     limit(1)
   );
@@ -203,7 +209,7 @@ export const linkWhatsAppToUser = async (
 
   const userDoc = querySnapshot.docs[0];
   
-  await updateDoc(doc(db, USERS_COLLECTION, userDoc.id), {
+  await updateDoc(doc(getDb(), USERS_COLLECTION, userDoc.id), {
     whatsappNumber: cleanNumber,
     updatedAt: serverTimestamp(),
   });

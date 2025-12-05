@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { registerWithEmail, signInWithGoogle, handleGoogleRedirectResult, onAuthChange } from '@/lib/firebase/auth-service';
+import { getLandingUrl } from '@/lib/urls';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -131,7 +132,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4 py-8 sm:py-12">
       {/* Back to Home Button */}
       <Link
-        href="http://localhost:3000"
+        href={getLandingUrl()}
         className="fixed top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white rounded-lg shadow-sm border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:shadow-md transition-all z-10"
       >
         <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +143,7 @@ export default function RegisterPage() {
 
       <div className="max-w-md w-full">
         <div className="text-center mb-6 sm:mb-8">
-          <Link href="http://localhost:3000" className="inline-block mb-4 sm:mb-6">
+          <Link href={getLandingUrl()} className="inline-block mb-4 sm:mb-6">
             <img src="/logo.png" alt="NUSA AI" className="w-25 h-14 md:w-30 md:h-20 rounded-lg object-cover" />
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Buat Akun Baru</h1>

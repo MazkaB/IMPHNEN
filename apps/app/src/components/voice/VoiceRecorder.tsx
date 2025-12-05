@@ -84,7 +84,7 @@ export function VoiceRecorder({ onTransactionSaved, autoSave = false }: VoiceRec
     setError(null);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await auth?.currentUser?.getIdToken();
       
       if (!token) {
         throw new Error('Tidak dapat mengambil token autentikasi');
@@ -128,7 +128,7 @@ export function VoiceRecorder({ onTransactionSaved, autoSave = false }: VoiceRec
 
     setIsProcessing(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await auth?.currentUser?.getIdToken();
       
       if (!token) {
         throw new Error('Tidak dapat mengambil token autentikasi');

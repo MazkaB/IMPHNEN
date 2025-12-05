@@ -43,7 +43,7 @@ export function TransactionList({
     setError(null);
 
     try {
-      const userId = auth.currentUser?.uid;
+      const userId = auth?.currentUser?.uid;
       
       if (!userId) {
         throw new Error('Tidak terautentikasi');

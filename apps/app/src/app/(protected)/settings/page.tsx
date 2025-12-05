@@ -176,7 +176,7 @@ export default function SettingsPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-500">WhatsApp Terhubung</p>
               <p className="font-medium text-gray-900">
-                {profile?.whatsappNumber || 'Belum terhubung'}
+                {(profile as { whatsappNumber?: string })?.whatsappNumber || 'Belum terhubung'}
               </p>
             </div>
           </CardContent>

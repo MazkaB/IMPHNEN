@@ -101,8 +101,8 @@ export const parseVoiceToTransaction = async (
 export const transcribeAudio = async (audioBuffer: Buffer): Promise<string> => {
   const openai = getOpenAIClient();
 
-  // Buat File object dari buffer
-  const audioFile = new File([audioBuffer], 'audio.ogg', { type: 'audio/ogg' });
+  // Buat File object dari buffer - convert to Uint8Array for compatibility
+  const audioFile = new File([new Uint8Array(audioBuffer)], 'audio.ogg', { type: 'audio/ogg' });
 
   const response = await openai.audio.transcriptions.create({
     file: audioFile,
