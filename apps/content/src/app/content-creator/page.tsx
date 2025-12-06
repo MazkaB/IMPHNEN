@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { dummyData } from './dummy-data';
 import { generateContent } from './actions';
-import { Image, ArrowLeft, Download, Copy, Loader2, Sparkles, CheckCircle } from 'lucide-react';
+import { Image, Download, Copy, Loader2, Sparkles, CheckCircle } from 'lucide-react';
 
 export default function ContentCreatorPage() {
   const [selectedInput, setSelectedInput] = useState<string>('');
@@ -94,21 +93,11 @@ export default function ContentCreatorPage() {
       {/* Header */}
       <header className="bg-white border-b-2 border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <Link 
-              href="/content"
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Kembali</span>
-            </Link>
-            <div className="h-6 w-px bg-gray-300" />
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-                <Image className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-xl text-gray-900">Content Creator</span>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+              <Image className="w-5 h-5 text-white" />
             </div>
+            <span className="font-bold text-xl text-gray-900">Content Creator</span>
           </div>
         </div>
       </header>

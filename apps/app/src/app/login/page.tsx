@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { loginWithEmail, signInWithGoogle, sendLoginLink, sendPasswordReset, handleGoogleRedirectResult } from '@/lib/firebase/auth-service';
+import { loginWithEmail, signInWithGoogle, sendLoginLink, sendPasswordReset } from '@/lib/firebase/auth-service';
 import { useAuthStore } from '@/store/auth-store';
 import { getLandingUrl } from '@/lib/urls';
 
@@ -19,17 +19,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const redirectHandled = useRef(false);
-
-  // Handle Google redirect result on mount
-  useEffect(() => {
-    handleGoogleRedirectResult().catch(console.error);
-  }, []);
-
   // Redirect if already authenticated - ke activate dulu untuk cek subscription
   useEffect(() => {
-    if (!authLoading && isAuthenticated && !redirectHandled.current) {
-      redirectHandled.current = true;
+    if (!authLoading && isAuthenticated) {
       router.replace('/activate');
     }
   }, [isAuthenticated, authLoading, router]);

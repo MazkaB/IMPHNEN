@@ -27,11 +27,13 @@ interface Summary {
   transactionCount: number;
 }
 
+import { getOcrUrl, getInsightUrl, getContentUrl } from '@/lib/urls';
+
 const quickActions = [
-  { href: '/voice', label: 'Catat Suara', icon: Mic, color: 'bg-blue-500' },
-  { href: '/ocr', label: 'Scan Struk', icon: FileText, color: 'bg-green-500' },
-  { href: '/insights', label: 'Lihat Insight', icon: BarChart3, color: 'bg-purple-500' },
-  { href: '/content', label: 'Buat Konten', icon: Image, color: 'bg-orange-500' },
+  { href: '/voice', label: 'Catat Suara', icon: Mic, color: 'bg-blue-500', external: false },
+  { href: getOcrUrl(), label: 'Scan Struk', icon: FileText, color: 'bg-green-500', external: true },
+  { href: getInsightUrl(), label: 'Lihat Insight', icon: BarChart3, color: 'bg-purple-500', external: true },
+  { href: `${getContentUrl()}/content-creator`, label: 'Buat Konten', icon: Image, color: 'bg-orange-500', external: true },
 ];
 
 export default function DashboardPage() {
@@ -150,20 +152,26 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-2 sm:gap-4">
-            {quickActions.map((action) => (
-              <Link
-                key={action.href}
-                href={action.href}
-                className="flex flex-col items-center p-2 sm:p-4 rounded-lg border border-gray-100 hover:border-primary-200 hover:shadow-md transition-all"
-              >
-                <div className={`p-2 sm:p-3 rounded-full ${action.color} mb-1 sm:mb-2`}>
-                  <action.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                </div>
-                <span className="text-[10px] sm:text-sm font-medium text-gray-700 text-center">
-                  {action.label}
-                </span>
-              </Link>
-            ))}
+            {quickActions.map((action) => {
+              const LinkComponent = action.external ? 'a' : Link;
+              const linkProps = action.external 
+                ? { href: action.href, target: '_blank', rel: 'noopener noreferrer' }
+                : { href: action.href };
+              return (
+                <LinkComponent
+                  key={action.href}
+                  {...linkProps}
+                  className="flex flex-col items-center p-2 sm:p-4 rounded-lg border border-gray-100 hover:border-primary-200 hover:shadow-md transition-all"
+                >
+                  <div className={`p-2 sm:p-3 rounded-full ${action.color} mb-1 sm:mb-2`}>
+                    <action.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <span className="text-[10px] sm:text-sm font-medium text-gray-700 text-center">
+                    {action.label}
+                  </span>
+                </LinkComponent>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

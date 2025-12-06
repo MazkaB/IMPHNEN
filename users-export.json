@@ -1,0 +1,44 @@
+{"users": [
+{
+  "localId": "3Dvj0DONliW25sNLKsQv6JnnzR53",
+  "email": "pancar.aura2302@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "D0PYW5bjxqruKygo+cY9FDbMvUP8d0NWczDqVyrvi3C2U0BqVGTElcV2RCOqWFdpAIRCsJ/pctM7ePVMJ1pkqg==",
+  "salt": "l7wU2gm1pH/iCg==",
+  "displayName": "Pancar Aura Zaki Ardika",
+  "lastSignedInAt": "1765005342144",
+  "createdAt": "1765005189732",
+  "providerUserInfo": []
+},
+{
+  "localId": "QQnUDRdApBQcBfVxFgrGIc69APi1",
+  "email": "mazkabuana@student.uns.ac.id",
+  "emailVerified": false,
+  "passwordHash": "KP36/TapXCivcNwDRRWCl7PMrKBmghotSFfgiVl54T6bBI4/w8nmTxo0pHJfk8wLPMxZIdEj5GG5Q74Av7efoQ==",
+  "salt": "5YlLjssFYPXNKQ==",
+  "displayName": "Mazka Buana Hidayat",
+  "lastSignedInAt": "1765007209535",
+  "createdAt": "1765004011836",
+  "providerUserInfo": []
+},
+{
+  "localId": "Rn6k1iPcfMM1eRRqzKgQi1PhPJw1",
+  "email": "admin@atamagri.app",
+  "emailVerified": false,
+  "passwordHash": "3wmktxBOS+K0zl+aQnKsiP7hk9GqOO1fZGuzIE+QAPd3I95voEDSw+8kyuwNGh4oPSiyIqP2ROlvuy50lOkseQ==",
+  "salt": "fckx2CgBX5h/0w==",
+  "createdAt": "1758284670838",
+  "disabled": false,
+  "providerUserInfo": []
+},
+{
+  "localId": "WJFhCeWOThQPpdWB4nRTxhqi1512",
+  "email": "nurmarufspace@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "IyuGb7d3QObSKVvNBOa6Luac7T1bkPjQAcqUNiK0FAILRGNz/OUIJ0Oh4ZjmoVGotkwOfgkq/aNsB6+5+ogOoQ==",
+  "salt": "htvIa75GZRYMJQ==",
+  "displayName": "mazka",
+  "lastSignedInAt": "1765012885046",
+  "createdAt": "1765012885046",
+  "providerUserInfo": []
+}]}

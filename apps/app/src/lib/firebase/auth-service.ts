@@ -11,6 +11,7 @@ import {
   UserCredential,
   onAuthStateChanged,
   GoogleAuthProvider,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
   ActionCodeSettings,
@@ -86,11 +87,60 @@ export const registerWithEmail = async (
   return userCredential;
 };
 
-// Login/Register dengan Google - langsung pakai redirect (lebih reliable)
+// Login/Register dengan Google - pakai popup (lebih reliable di Vercel)
 export const signInWithGoogle = async (): Promise<UserCredential | null> => {
-  // Langsung pakai redirect - lebih reliable daripada popup yang sering stuck karena COOP
-  await signInWithRedirect(getAuth(), googleProvider);
-  return null;
+  try {
+    // Pakai popup - lebih reliable untuk production di Vercel
+    const result = await signInWithPopup(getAuth(), googleProvider);
+    
+    // Save user profile if new user
+    if (result.user) {
+      await saveUserProfileIfNotExistsInternal(result.user);
+    }
+    
+    return result;
+  } catch (error: unknown) {
+    const firebaseError = error as { code?: string; message?: string };
+    
+    // If popup blocked, fallback to redirect
+    if (firebaseError.code === 'auth/popup-blocked' || 
+        firebaseError.code === 'auth/popup-closed-by-user') {
+      console.log('Popup blocked/closed, falling back to redirect');
+      await signInWithRedirect(getAuth(), googleProvider);
+      return null;
+    }
+    
+    throw error;
+  }
+};
+
+// Internal function to save profile (avoid circular dependency)
+const saveUserProfileIfNotExistsInternal = async (user: User): Promise<void> => {
+  try {
+    const docSnap = await getDoc(doc(getDb(), 'users', user.uid));
+    if (!docSnap.exists()) {
+      const provider = user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email';
+      await setDoc(doc(getDb(), 'users', user.uid), {
+        uid: user.uid,
+        email: user.email?.toLowerCase() || '',
+        displayName: user.displayName || '',
+        photoURL: user.photoURL || '',
+        businessName: '',
+        phoneNumber: user.phoneNumber || '',
+        emailVerified: user.emailVerified,
+        provider,
+        subscription: {
+          status: 'inactive',
+          plan: 'free',
+        },
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      console.log('User profile created for:', user.email);
+    }
+  } catch (error) {
+    console.error('Error saving user profile:', error);
+  }
 };
 
 // Handle redirect result (call this on page load)
@@ -199,6 +249,21 @@ const saveUserProfile = async (user: User, provider: 'email' | 'google', busines
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+};
+
+// Save user profile if it doesn't exist (for Google sign-in)
+export const saveUserProfileIfNotExists = async (user: User): Promise<void> => {
+  try {
+    const existingProfile = await getUserProfile(user.uid);
+    if (!existingProfile) {
+      const provider = user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email';
+      await saveUserProfile(user, provider);
+      console.log('User profile created for:', user.email);
+    }
+  } catch (error) {
+    console.error('Error saving user profile:', error);
+    throw error;
+  }
 };
 
 // Get user profile dari Firestore

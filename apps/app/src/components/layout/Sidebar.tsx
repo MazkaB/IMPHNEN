@@ -22,13 +22,15 @@ import {
   X,
 } from 'lucide-react';
 
+import { getOcrUrl, getInsightUrl, getContentUrl } from '@/lib/urls';
+
 const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/voice', label: 'Catat Suara', icon: Mic },
-  { href: '/ocr', label: 'Scan Struk', icon: ScanLine },
-  { href: '/insights', label: 'Insight AI', icon: BarChart3 },
-  { href: '/content', label: 'Auto Konten', icon: Sparkles },
-  { href: '/whatsapp', label: 'WhatsApp Bot', icon: MessageCircle },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, external: false },
+  { href: '/voice', label: 'Catat Suara', icon: Mic, external: false },
+  { href: getOcrUrl(), label: 'Scan Struk', icon: ScanLine, external: true },
+  { href: getInsightUrl(), label: 'Insight AI', icon: BarChart3, external: true },
+  { href: `${getContentUrl()}/content-creator`, label: 'Auto Konten', icon: Sparkles, external: true },
+  { href: '/whatsapp', label: 'WhatsApp Bot', icon: MessageCircle, external: false },
 ];
 
 export function Sidebar() {
@@ -108,11 +110,15 @@ export function Sidebar() {
           <nav className="px-3 space-y-1">
             <p className="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
             {menuItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = !item.external && pathname === item.href;
+              const LinkComponent = item.external ? 'a' : Link;
+              const linkProps = item.external 
+                ? { href: item.href, target: '_blank', rel: 'noopener noreferrer' }
+                : { href: item.href };
               return (
-                <Link
+                <LinkComponent
                   key={item.href}
-                  href={item.href}
+                  {...linkProps}
                   onClick={() => setMobileOpen(false)}
                   className={`
                     group flex items-center rounded-xl transition-all duration-200 px-3 py-2.5
@@ -128,7 +134,7 @@ export function Sidebar() {
                   <span className={`text-sm font-medium ${isActive ? 'text-white' : 'text-slate-700'}`}>
                     {item.label}
                   </span>
-                </Link>
+                </LinkComponent>
               );
             })}
           </nav>
@@ -161,19 +167,25 @@ export function Sidebar() {
         ${isCollapsed ? 'lg:w-20' : 'lg:w-72'}
       `}>
       {/* Logo & Toggle */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 relative">
         <div className={`flex items-center ${isCollapsed ? 'justify-center w-full' : ''}`}>
-          <img 
-            src="/logo.png" 
-            alt="NUSA AI" 
-            className={`rounded-lg object-cover flex-shrink-0 ${isCollapsed ? 'w-12 h-12' : 'w-30 h-20'}`} 
-          />
+          {isCollapsed ? (
+            <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">N</span>
+            </div>
+          ) : (
+            <img 
+              src="/logo.png" 
+              alt="NUSA AI" 
+              className="w-28 h-14 rounded-lg object-cover flex-shrink-0"
+            />
+          )}
         </div>
         <button
           onClick={toggle}
           className={`
             p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600
-            ${isCollapsed ? 'absolute -right-3 top-5 bg-white border border-slate-200 shadow-sm' : ''}
+            ${isCollapsed ? 'absolute -right-3 top-5 bg-white border border-slate-200 shadow-sm z-10' : ''}
           `}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -215,11 +227,15 @@ export function Sidebar() {
             <p className="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
           )}
           {menuItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = !item.external && pathname === item.href;
+            const LinkComponent = item.external ? 'a' : Link;
+            const linkProps = item.external 
+              ? { href: item.href, target: '_blank', rel: 'noopener noreferrer' }
+              : { href: item.href };
             return (
-              <Link
+              <LinkComponent
                 key={item.href}
-                href={item.href}
+                {...linkProps}
                 title={isCollapsed ? item.label : undefined}
                 className={`
                   group flex items-center rounded-xl transition-all duration-200
@@ -242,7 +258,7 @@ export function Sidebar() {
                     {item.label}
                   </span>
                 )}
-              </Link>
+              </LinkComponent>
             );
           })}
         </nav>

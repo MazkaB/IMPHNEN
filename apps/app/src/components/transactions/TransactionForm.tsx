@@ -40,32 +40,23 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
     setIsLoading(true);
 
     try {
-      const token = await auth?.currentUser?.getIdToken();
+      const userId = auth?.currentUser?.uid;
       
-      if (!token) {
+      if (!userId) {
         throw new Error('Tidak terautentikasi');
       }
 
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          type,
-          amount: numAmount,
-          description,
-          category,
-          source: 'manual',
-        }),
+      // Save directly to Firestore (client-side)
+      const { saveTransaction } = await import('@/lib/firebase/transaction-service');
+      
+      await saveTransaction({
+        userId,
+        type,
+        amount: numAmount,
+        description,
+        category,
+        source: 'manual',
       });
-
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
 
       // Reset form
       setAmount('');
@@ -173,7 +164,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base text-gray-900 bg-white"
             >
               <option value="">Pilih kategori</option>
               {categories.map((cat) => (
