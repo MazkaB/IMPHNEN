@@ -92,6 +92,19 @@ service cloud.firestore {
         && resource.data.userId == request.auth.uid;
     }
     
+    // Promo codes collection
+    match /promoCodes/{code} {
+      // Anyone authenticated can read promo codes (to validate)
+      allow read: if isAuthenticated();
+      // Allow create for initial setup (temporary - remove after seeding)
+      allow create: if isAuthenticated();
+      // Only allow update to increment usedCount
+      allow update: if isAuthenticated() 
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedCount']);
+      // Delete only via Admin SDK or console
+      allow delete: if false;
+    }
+    
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

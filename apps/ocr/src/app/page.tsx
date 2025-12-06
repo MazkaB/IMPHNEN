@@ -2,11 +2,12 @@
 
 import { useState, useRef } from 'react';
 import { FileText, Upload, Camera, Loader2, Save, CheckCircle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { processDocument, type OCRResult, type DocumentType } from '@/lib/api/ocr-client';
+import { processDocument, type OCRResult, type DocumentType, getDocumentTypeLabel } from '@/lib/api/ocr-client';
 import { db } from '@/lib/firebase/config';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { AuthGuard } from '@/components/providers/AuthProvider';
 
-export default function OCRPage() {
+function OCRPageContent() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [processing, setProcessing] = useState(false);
@@ -99,18 +100,7 @@ export default function OCRPage() {
     }
   };
 
-  const getDocumentTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      auto: '🤖 Deteksi Otomatis',
-      receipt: '🧾 Struk Belanja',
-      invoice: '📄 Invoice/Faktur',
-      purchase_order: '📋 Purchase Order',
-      bank_statement: '🏦 Rekening Koran',
-      stock_card: '📦 Kartu Stok',
-      contract: '📜 Kontrak/Surat',
-    };
-    return labels[type] || type;
-  };
+
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -229,8 +219,8 @@ export default function OCRPage() {
 
             <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-white rounded-lg shadow-sm">
               <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1">Powered by:</p>
-              <p className="text-lg sm:text-xl font-bold text-green-600">PaddleOCR + Gemini AI</p>
-              <p className="text-[10px] sm:text-xs text-gray-500">Smart Document Processing</p>
+              <p className="text-lg sm:text-xl font-bold text-green-600">Gemini 2.0 Flash Vision</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">AI-Powered Document Processing</p>
             </div>
           </div>
         </div>
@@ -358,11 +348,20 @@ export default function OCRPage() {
         <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-4 sm:p-6 rounded-xl">
           <h3 className="font-bold mb-2 flex items-center gap-2 text-sm sm:text-base">ℹ️ Informasi</h3>
           <p className="text-xs sm:text-sm opacity-90">
-            Sistem ini menggunakan <strong>PaddleOCR + Gemini AI</strong> untuk mendeteksi teks dari berbagai jenis dokumen.
+            Sistem ini menggunakan <strong>Gemini 2.0 Flash Vision AI</strong> untuk mendeteksi dan mengekstrak teks dari berbagai jenis dokumen secara otomatis.
             Data hasil scan akan disimpan ke database untuk arsip digital Anda.
           </p>
         </div>
       </div>
     </main>
+  );
+}
+
+
+export default function OCRPage() {
+  return (
+    <AuthGuard>
+      <OCRPageContent />
+    </AuthGuard>
   );
 }

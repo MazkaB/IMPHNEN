@@ -75,9 +75,10 @@
 
 ### 2. 📷 OCR Digitalisasi (OCR App)
 - Scan struk belanja, invoice, rekening koran
-- Auto-detect jenis dokumen dengan AI
-- Parsing data terstruktur dengan Gemini AI
+- Auto-detect jenis dokumen dengan Gemini Vision AI
+- Parsing data terstruktur langsung dari gambar
 - Arsip digital otomatis ke Firebase
+- **100% Serverless** - No Python backend needed!
 
 ### 3. 📊 Dashboard Insight (Insight App)
 - Profit/Loss real-time
@@ -117,8 +118,7 @@
 |------------|---------|---------|
 | Firebase | 11.1.0 | Auth, Firestore, Storage |
 | Firebase Admin | 13.0.2 | Server-side Operations |
-| PaddleOCR | 2.7+ | OCR Engine |
-| Google Gemini | 2.0 Flash | AI Processing |
+| Google Gemini | 2.0 Flash | AI Processing & Vision OCR |
 
 ### Build Tools
 | Technology | Version | Purpose |
@@ -187,11 +187,11 @@ nusa-ai-monorepo/
 │   │       ├── lib/firebase/
 │   │       └── store/
 │   │
-│   ├── ocr/              # OCR Application
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   └── lib/api/
-│   │   └── ocr-service/  # Python FastAPI backend
+│   ├── ocr/              # OCR Application (Gemini Vision)
+│   │   └── src/
+│   │       ├── app/
+│   │       │   └── api/ocr/  # Serverless OCR API
+│   │       └── lib/
 │   │
 │   ├── insight/          # Dashboard Insight
 │   │   └── src/
@@ -278,29 +278,7 @@ NEXT_PUBLIC_OCR_URL=https://nusa-ocr.vercel.app
 NEXT_PUBLIC_CONTENT_URL=https://nusa-content.vercel.app
 ```
 
-### Step 4: Setup OCR Service (Optional)
-
-```bash
-cd apps/ocr/ocr-service
-
-# Buat virtual environment
-python -m venv venv
-
-# Aktivasi (Windows)
-.\venv\Scripts\activate
-
-# Aktivasi (Linux/Mac)
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Setup environment
-cp .env.example .env
-# Edit .env dan isi GEMINI_API_KEY
-```
-
-### Step 5: Jalankan Aplikasi
+### Step 4: Jalankan Aplikasi
 
 ```bash
 # Jalankan semua apps sekaligus
@@ -314,13 +292,7 @@ npm run dev:insight   # http://localhost:3003
 npm run dev:content   # http://localhost:3004
 ```
 
-### Step 6: Jalankan OCR Service (Optional)
-
-```bash
-cd apps/ocr/ocr-service
-python main.py
-# OCR Service berjalan di http://localhost:8000
-```
+> **Note:** OCR app menggunakan Gemini Vision API langsung, tidak perlu menjalankan Python backend terpisah!
 
 ---
 

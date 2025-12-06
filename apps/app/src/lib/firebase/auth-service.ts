@@ -22,6 +22,17 @@ import {
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './config';
 
+export type SubscriptionStatus = 'inactive' | 'active' | 'trial' | 'expired';
+export type SubscriptionPlan = 'free' | 'basic' | 'pro' | 'enterprise';
+
+export interface Subscription {
+  status: SubscriptionStatus;
+  plan: SubscriptionPlan;
+  activatedAt?: Date;
+  expiresAt?: Date;
+  promoCode?: string;
+}
+
 export interface UserProfile {
   uid: string;
   email: string;
@@ -31,6 +42,7 @@ export interface UserProfile {
   phoneNumber?: string;
   emailVerified: boolean;
   provider: 'email' | 'google';
+  subscription?: Subscription;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -180,6 +192,10 @@ const saveUserProfile = async (user: User, provider: 'email' | 'google', busines
     phoneNumber: user.phoneNumber || '',
     emailVerified: user.emailVerified,
     provider,
+    subscription: {
+      status: 'inactive',
+      plan: 'free',
+    },
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });

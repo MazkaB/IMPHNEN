@@ -1,0 +1,40 @@
+{
+  "promoCodes": {
+    "NUSA2024": {
+      "code": "NUSA2024",
+      "plan": "pro",
+      "durationDays": 30,
+      "maxUses": 100,
+      "usedCount": 0,
+      "isActive": true,
+      "createdAt": { "_seconds": 1733468400, "_nanoseconds": 0 }
+    },
+    "HACKATHON": {
+      "code": "HACKATHON",
+      "plan": "pro",
+      "durationDays": 90,
+      "maxUses": 50,
+      "usedCount": 0,
+      "isActive": true,
+      "createdAt": { "_seconds": 1733468400, "_nanoseconds": 0 }
+    },
+    "TRIAL7": {
+      "code": "TRIAL7",
+      "plan": "basic",
+      "durationDays": 7,
+      "maxUses": 1000,
+      "usedCount": 0,
+      "isActive": true,
+      "createdAt": { "_seconds": 1733468400, "_nanoseconds": 0 }
+    },
+    "UMKM2024": {
+      "code": "UMKM2024",
+      "plan": "basic",
+      "durationDays": 30,
+      "maxUses": 500,
+      "usedCount": 0,
+      "isActive": true,
+      "createdAt": { "_seconds": 1733468400, "_nanoseconds": 0 }
+    }
+  }
+}

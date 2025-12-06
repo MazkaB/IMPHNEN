@@ -96,10 +96,10 @@
 ## 6. Bonus Teknis (+20 Poin Max)
 
 - [ ] Testing (+15) - Belum ada
-- [x] Advanced Tech (+10) - AI/ML Integration (Gemini, PaddleOCR)
-- [ ] Deployment (+10) - Belum di-deploy
+- [x] Advanced Tech (+10) - AI/ML Integration (Gemini Vision API)
+- [x] Deployment (+10) - Semua 5 apps live di Vercel ✅
 - [ ] CI/CD (+5) - Belum ada
-- [ ] DevOps/Docker (+5) - Belum ada
+- [ ] DevOps/Docker (+5) - Tidak diperlukan (100% serverless)
 - [ ] Pre-commit hooks (+5) - Belum ada
 
 ---
@@ -125,7 +125,14 @@
 | Functionality | 50 | ✅ Ready |
 | Documentation | 80 | 📝 Need Video |
 | **Subtotal** | **200** | |
-| Bonus | +10 | AI Integration |
+| Bonus | +20 | AI Integration + Deployment |
 | Penalti | 0 | ✅ Clean |
 
-**Estimated Score: 180-190+ (tanpa video)**
+**Estimated Score: 190-200+ (tanpa video)**
+
+### Deployment URLs (All Live ✅)
+- Landing: https://nusa-landing-delta.vercel.app
+- App: https://nusa-app-khaki.vercel.app
+- Insight: https://nusa-insight.vercel.app
+- OCR: https://nusa-ocr.vercel.app
+- Content: https://nusa-content.vercel.app

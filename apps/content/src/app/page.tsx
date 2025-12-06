@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { Image, Instagram, MessageCircle, Video, ArrowRight, Sparkles, Home } from 'lucide-react';
 import { getDashboardUrl } from '@/lib/urls';
+import { AuthGuard } from '@/components/providers/AuthProvider';
 
-export default function ContentHomePage() {
+function ContentHomePageContent() {
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -161,5 +162,13 @@ export default function ContentHomePage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function ContentHomePage() {
+  return (
+    <AuthGuard>
+      <ContentHomePageContent />
+    </AuthGuard>
   );
 }
