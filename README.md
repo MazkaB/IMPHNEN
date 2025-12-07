@@ -4,7 +4,8 @@
 
 **NUSA AI** - Platform Digitalisasi UMKM Indonesia
 
-![Uploading image.png…]()
+![WhatsApp Image 2025-12-07 at 22 16 03_521a2804](https://github.com/user-attachments/assets/e537006f-e081-4b27-919e-c6e84e0acbde)
+
 
 **Platform SaaS berbasis AI untuk membantu UMKM Indonesia dalam pencatatan keuangan, digitalisasi dokumen, dan analisis bisnis.**
 
