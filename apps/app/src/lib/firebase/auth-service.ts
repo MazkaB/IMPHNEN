@@ -105,7 +105,6 @@ export const signInWithGoogle = async (): Promise<UserCredential | null> => {
     // If popup blocked, fallback to redirect
     if (firebaseError.code === 'auth/popup-blocked' || 
         firebaseError.code === 'auth/popup-closed-by-user') {
-      console.log('Popup blocked/closed, falling back to redirect');
       await signInWithRedirect(getAuth(), googleProvider);
       return null;
     }
@@ -136,10 +135,9 @@ const saveUserProfileIfNotExistsInternal = async (user: User): Promise<void> => 
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      console.log('User profile created for:', user.email);
     }
   } catch (error) {
-    console.error('Error saving user profile:', error);
+    // Silent fail for profile creation
   }
 };
 
@@ -258,10 +256,8 @@ export const saveUserProfileIfNotExists = async (user: User): Promise<void> => {
     if (!existingProfile) {
       const provider = user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email';
       await saveUserProfile(user, provider);
-      console.log('User profile created for:', user.email);
     }
   } catch (error) {
-    console.error('Error saving user profile:', error);
     throw error;
   }
 };

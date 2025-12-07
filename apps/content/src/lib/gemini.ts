@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
 
 if (!apiKey) {
   console.warn('GEMINI_API_KEY tidak ditemukan di environment variables.');
@@ -8,4 +8,5 @@ if (!apiKey) {
 
 export const genAI = new GoogleGenerativeAI(apiKey || '');
 
-export const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+// Use Gemini 2.5 Flash for better performance
+export const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });

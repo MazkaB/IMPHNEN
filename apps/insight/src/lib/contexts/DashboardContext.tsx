@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from '@/lib/hooks/useAuth';
 import { Product } from '@/types/product';
 import { Transaction } from '@/types/transaction';
 import { AccountReceivable, AccountPayable } from '@/types/analytics';
@@ -26,6 +25,8 @@ interface DashboardContextType {
   receivables: AccountReceivable[];
   payables: AccountPayable[];
   loading: boolean;
+  userId: string | null;
+  setUserId: (id: string | null) => void;
   addProduct: (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   addTransaction: (transactionData: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   updateProduct: (id: string, productData: Partial<Product>) => Promise<void>;
@@ -49,7 +50,7 @@ function convertTimestamp(timestamp: unknown): Date {
 }
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const [userId, setUserId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [receivables, setReceivables] = useState<AccountReceivable[]>([]);
@@ -58,7 +59,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   // Subscribe to transactions from Firebase
   useEffect(() => {
-    if (!user?.uid || !db) {
+    if (!userId || !db) {
       setTransactions([]);
       setLoading(false);
       return;
@@ -69,7 +70,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     // Query transactions collection (same as apps/app)
     const q = query(
       collection(db, 'transactions'),
-      where('userId', '==', user.uid),
+      where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );
 
@@ -83,7 +84,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
           // Map from apps/app Transaction format to insight Transaction format
           return {
             id: docSnap.id,
-            userId: data.userId || user.uid,
+            userId: data.userId || userId,
             date: createdAt,
             time: createdAt.toLocaleTimeString('id-ID'),
             product: data.description || 'Produk',
@@ -113,18 +114,18 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     );
 
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [userId]);
 
   // Subscribe to products from Firebase
   useEffect(() => {
-    if (!user?.uid || !db) {
+    if (!userId || !db) {
       setProducts([]);
       return;
     }
 
     const q = query(
       collection(db, 'products'),
-      where('userId', '==', user.uid),
+      where('userId', '==', userId),
       orderBy('name', 'asc')
     );
 
@@ -148,14 +149,90 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     );
 
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [userId]);
+
+  // Subscribe to receivables
+  useEffect(() => {
+    if (!userId || !db) {
+      setReceivables([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'receivables'),
+      where('userId', '==', userId)
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const data: AccountReceivable[] = snapshot.docs.map((docSnap) => {
+          const d = docSnap.data();
+          return {
+            id: docSnap.id,
+            customerName: d.customerName || d.name || 'Unknown',
+            amount: d.amount || 0,
+            dueDate: d.dueDate ? convertTimestamp(d.dueDate) : new Date(),
+            status: d.status || 'pending',
+            userId: d.userId,
+            createdAt: d.createdAt ? convertTimestamp(d.createdAt) : new Date(),
+            updatedAt: d.updatedAt ? convertTimestamp(d.updatedAt) : new Date(),
+          } as AccountReceivable;
+        });
+        setReceivables(data);
+      },
+      (error) => {
+        console.error('Error fetching receivables:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [userId]);
+
+  // Subscribe to payables
+  useEffect(() => {
+    if (!userId || !db) {
+      setPayables([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'payables'),
+      where('userId', '==', userId)
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const data: AccountPayable[] = snapshot.docs.map((docSnap) => {
+          const d = docSnap.data();
+          return {
+            id: docSnap.id,
+            supplierName: d.supplierName || d.name || 'Unknown',
+            amount: d.amount || 0,
+            dueDate: d.dueDate ? convertTimestamp(d.dueDate) : new Date(),
+            status: d.status || 'pending',
+            userId: d.userId,
+            createdAt: d.createdAt ? convertTimestamp(d.createdAt) : new Date(),
+            updatedAt: d.updatedAt ? convertTimestamp(d.updatedAt) : new Date(),
+          } as AccountPayable;
+        });
+        setPayables(data);
+      },
+      (error) => {
+        console.error('Error fetching payables:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [userId]);
 
   const addProduct = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user?.uid || !db) throw new Error('User must be logged in');
+    if (!userId || !db) throw new Error('User must be logged in');
 
     const docRef = await addDoc(collection(db, 'products'), {
       ...productData,
-      userId: user.uid,
+      userId: userId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -164,11 +241,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   };
 
   const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user?.uid || !db) throw new Error('User must be logged in');
+    if (!userId || !db) throw new Error('User must be logged in');
 
     const docRef = await addDoc(collection(db, 'transactions'), {
       ...transactionData,
-      userId: user.uid,
+      userId: userId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -177,7 +254,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   };
 
   const updateProduct = async (id: string, productData: Partial<Product>) => {
-    if (!user?.uid || !db) throw new Error('User must be logged in');
+    if (!userId || !db) throw new Error('User must be logged in');
 
     const productRef = doc(db, 'products', id);
     await updateDoc(productRef, {
@@ -187,7 +264,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteProduct = async (id: string) => {
-    if (!user?.uid || !db) throw new Error('User must be logged in');
+    if (!userId || !db) throw new Error('User must be logged in');
 
     const productRef = doc(db, 'products', id);
     await deleteDoc(productRef);
@@ -205,6 +282,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         receivables,
         payables,
         loading,
+        userId,
+        setUserId,
         addProduct,
         addTransaction,
         updateProduct,

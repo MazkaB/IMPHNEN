@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Mic, MicOff, Loader2, Check, X, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
 import { useAuthStore } from '@/store/auth-store';
 import { auth } from '@/lib/firebase/config';
 
@@ -20,295 +18,279 @@ interface VoiceRecorderProps {
   autoSave?: boolean;
 }
 
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  abort(): void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event & { error: string }) => void) | null;
+  onend: (() => void) | null;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
+
 export function VoiceRecorder({ onTransactionSaved, autoSave = false }: VoiceRecorderProps) {
   const { isAuthenticated } = useAuthStore();
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcription, setTranscription] = useState<string | null>(null);
+  const [interimTranscript, setInterimTranscript] = useState<string>('');
   const [parsedTransaction, setParsedTransaction] = useState<ParsedTransaction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const [speechSupported, setSpeechSupported] = useState(true);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) setSpeechSupported(false);
+    }
+  }, []);
 
   const startRecording = useCallback(async () => {
-    if (!isAuthenticated) {
-      setError('Silakan login terlebih dahulu');
-      return;
-    }
+    if (!isAuthenticated) { setError('Silakan login terlebih dahulu'); return; }
+    if (!speechSupported) { setError('Browser tidak mendukung pengenalan suara. Gunakan Chrome atau Edge.'); return; }
 
     try {
-      setError(null);
-      setTranscription(null);
-      setParsedTransaction(null);
-      setConfirmationMessage(null);
+      setError(null); setTranscription(null); setInterimTranscript('');
+      setParsedTransaction(null); setConfirmationMessage(null);
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus',
-      });
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'id-ID';
 
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interim = '', final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) final += result[0].transcript;
+          else interim += result[0].transcript;
+        }
+        if (final) setTranscription(prev => (prev || '') + final);
+        setInterimTranscript(interim);
+      };
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+      recognition.onerror = (event) => {
+        if (event.error === 'no-speech') setError('Tidak ada suara terdeteksi.');
+        else if (event.error === 'audio-capture') setError('Mikrofon tidak ditemukan.');
+        else if (event.error === 'not-allowed') setError('Izin mikrofon ditolak.');
+        else setError('Gagal mengenali suara.');
+        setIsRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+        if (transcription || interimTranscript) {
+          const finalText = (transcription || '') + interimTranscript;
+          if (finalText.trim()) processTranscription(finalText.trim());
         }
       };
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        stream.getTracks().forEach((track) => track.stop());
-        await processAudio(audioBlob);
-      };
-
-      mediaRecorder.start();
+      recognitionRef.current = recognition;
+      recognition.start();
       setIsRecording(true);
-    } catch (err) {
-      console.error('Failed to start recording:', err);
-      setError('Gagal mengakses mikrofon. Pastikan izin sudah diberikan.');
-    }
-  }, [isAuthenticated]);
+    } catch { setError('Gagal memulai pengenalan suara.'); }
+  }, [isAuthenticated, speechSupported, transcription, interimTranscript]);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
       setIsRecording(false);
+      const finalText = (transcription || '') + interimTranscript;
+      if (finalText.trim()) processTranscription(finalText.trim());
+      else setError('Tidak ada suara terdeteksi.');
     }
-  }, [isRecording]);
+  }, [isRecording, transcription, interimTranscript]);
 
-  const processAudio = async (audioBlob: Blob) => {
-    setIsProcessing(true);
-    setError(null);
 
+  const processTranscription = async (text: string) => {
+    setIsProcessing(true); setError(null); setTranscription(text); setInterimTranscript('');
     try {
       const token = await auth?.currentUser?.getIdToken();
-      
-      if (!token) {
-        throw new Error('Tidak dapat mengambil token autentikasi');
-      }
+      if (!token) throw new Error('Tidak dapat mengambil token autentikasi');
 
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('autoSave', autoSave.toString());
-
-      const response = await fetch('/api/voice/transcribe', {
+      const response = await fetch('/api/voice/parse', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ transcription: text, autoSave }),
       });
-
       const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Gagal memproses teks');
 
-      if (!result.success) {
-        throw new Error(result.error || 'Gagal memproses audio');
-      }
-
-      setTranscription(result.data.transcription);
       setParsedTransaction(result.data.parsed);
-
       if (result.data.autoSaved && result.data.transactionId) {
         setConfirmationMessage(result.data.confirmationMessage);
         onTransactionSaved?.(result.data.transactionId);
       }
     } catch (err) {
-      console.error('Audio processing error:', err);
-      setError(err instanceof Error ? err.message : 'Gagal memproses audio');
-    } finally {
-      setIsProcessing(false);
-    }
+      setError(err instanceof Error ? err.message : 'Gagal memproses teks');
+    } finally { setIsProcessing(false); }
   };
 
   const saveTransaction = async () => {
     if (!parsedTransaction) return;
-
     setIsProcessing(true);
     try {
       const token = await auth?.currentUser?.getIdToken();
-      
-      if (!token) {
-        throw new Error('Tidak dapat mengambil token autentikasi');
-      }
+      if (!token) throw new Error('Tidak dapat mengambil token autentikasi');
 
       const response = await fetch('/api/transactions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...parsedTransaction,
-          source: 'voice',
-          rawInput: transcription,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ...parsedTransaction, source: 'voice', rawInput: transcription }),
       });
-
       const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Gagal menyimpan transaksi');
 
-      if (!result.success) {
-        throw new Error(result.error || 'Gagal menyimpan transaksi');
-      }
-
-      setConfirmationMessage('Transaksi berhasil disimpan!');
+      setConfirmationMessage('Transaksi berhasil disimpan');
       onTransactionSaved?.(result.data.id);
     } catch (err) {
-      console.error('Save transaction error:', err);
       setError(err instanceof Error ? err.message : 'Gagal menyimpan transaksi');
-    } finally {
-      setIsProcessing(false);
-    }
+    } finally { setIsProcessing(false); }
   };
 
   const resetState = () => {
-    setTranscription(null);
-    setParsedTransaction(null);
-    setError(null);
-    setConfirmationMessage(null);
+    setTranscription(null); setInterimTranscript(''); setParsedTransaction(null);
+    setError(null); setConfirmationMessage(null);
   };
 
+
   return (
-    <Card className="w-full">
-      <CardContent className="p-4 sm:p-6">
-        <div className="text-center">
-          {/* Main Recording Button - Very Large for Elderly */}
-          <div className="relative inline-block mb-6">
-            {isRecording && (
-              <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-50" />
+    <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <div className="text-center">
+        {/* Main Recording Button */}
+        <div className="relative inline-block mb-6">
+          {isRecording && (
+            <div className="absolute inset-0 bg-gray-900 rounded-full animate-ping opacity-30" />
+          )}
+          <button
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isProcessing || !speechSupported}
+            className={`
+              relative w-32 h-32 sm:w-36 sm:h-36 rounded-full flex items-center justify-center
+              transition-all duration-200 focus:outline-none focus:ring-4 shadow-lg
+              ${isRecording ? 'bg-red-600 hover:bg-red-700 focus:ring-red-200' : 'bg-gray-900 hover:bg-gray-800 focus:ring-gray-300'}
+              ${isProcessing || !speechSupported ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
+            aria-label={isRecording ? 'Berhenti merekam' : 'Mulai merekam'}
+          >
+            {isProcessing ? (
+              <Loader2 className="w-14 h-14 text-white animate-spin" />
+            ) : isRecording ? (
+              <MicOff className="w-14 h-14 text-white" />
+            ) : (
+              <Mic className="w-14 h-14 text-white" />
             )}
-            <button
-              onClick={isRecording ? stopRecording : startRecording}
-              disabled={isProcessing}
-              className={`
-                relative w-28 h-28 sm:w-36 sm:h-36 rounded-full flex items-center justify-center
-                transition-all duration-200 focus:outline-none focus:ring-4 shadow-xl
-                ${isRecording
-                  ? 'bg-red-500 hover:bg-red-600 focus:ring-red-300 scale-110'
-                  : 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-300'
-                }
-                ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-              `}
-              aria-label={isRecording ? 'Berhenti merekam' : 'Mulai merekam'}
-            >
-              {isProcessing ? (
-                <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-spin" />
-              ) : isRecording ? (
-                <MicOff className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
-              ) : (
-                <Mic className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
-              )}
+          </button>
+        </div>
+
+        {/* Status Text */}
+        <p className="text-lg font-medium text-gray-700 mb-4">
+          {!speechSupported ? 'Browser tidak mendukung' : isRecording ? 'Mendengarkan... Tekan untuk berhenti'
+            : isProcessing ? 'Memproses suara...' : 'Tekan tombol untuk bicara'}
+        </p>
+
+        {/* Live Transcription */}
+        {(isRecording || interimTranscript) && (
+          <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4">
+            <p className="text-sm text-gray-500 mb-1">Mendengarkan...</p>
+            <p className="text-lg text-gray-800">
+              {transcription}<span className="text-gray-400">{interimTranscript}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-4">
+            <p className="font-medium">{error}</p>
+            <button onClick={resetState} className="mt-3 px-4 py-2 bg-red-100 hover:bg-red-200 rounded-lg font-medium">
+              Coba Lagi
             </button>
           </div>
+        )}
 
-          {/* Status Text - Large */}
-          <p className="text-lg sm:text-xl font-medium text-gray-700 mb-4">
-            {isRecording
-              ? '🔴 Sedang merekam... Tekan untuk berhenti'
-              : isProcessing
-              ? '⏳ Memproses suara Anda...'
-              : '🎤 Tekan tombol untuk mulai bicara'}
-          </p>
+        {/* Transcription Result */}
+        {transcription && !isRecording && !confirmationMessage && !error && (
+          <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4 text-left">
+            <p className="text-sm text-gray-500 mb-1">Anda bilang:</p>
+            <p className="text-lg font-medium text-gray-900">&quot;{transcription}&quot;</p>
+          </div>
+        )}
 
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border-2 border-red-200 text-red-700 p-4 rounded-xl mb-4 text-base" role="alert">
-              ⚠️ {error}
-              <button 
-                onClick={resetState}
-                className="block w-full mt-3 text-center text-red-600 font-medium"
-              >
-                Coba Lagi
+        {/* Parsed Transaction */}
+        {parsedTransaction && !confirmationMessage && (
+          <div className="space-y-4 mb-4">
+            <div className={`p-6 rounded-xl border ${parsedTransaction.type === 'income' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <p className={`text-lg font-bold mb-2 ${parsedTransaction.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
+                {parsedTransaction.type === 'income' ? 'PEMASUKAN' : 'PENGELUARAN'}
+              </p>
+              <p className="text-3xl font-bold text-gray-900">Rp {parsedTransaction.amount.toLocaleString('id-ID')}</p>
+              <p className="text-gray-700 mt-2">{parsedTransaction.description}</p>
+              <p className="text-gray-500 text-sm">Kategori: {parsedTransaction.category}</p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={saveTransaction} disabled={isProcessing}
+                className="flex-1 flex items-center justify-center gap-2 py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl disabled:opacity-50">
+                {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />} Simpan
+              </button>
+              <button onClick={resetState} className="py-4 px-5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl">
+                <X className="w-5 h-5" />
               </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Transcription Result */}
-          {transcription && !confirmationMessage && (
-            <div className="bg-gray-50 border-2 border-gray-200 p-4 rounded-xl mb-4 text-left">
-              <p className="text-sm text-gray-500 mb-2">Anda bilang:</p>
-              <p className="text-lg sm:text-xl font-medium text-gray-900">&quot;{transcription}&quot;</p>
+        {/* Confirmation */}
+        {confirmationMessage && (
+          <div className="bg-green-50 border border-green-200 p-6 rounded-xl">
+            <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-10 h-10 text-white" />
             </div>
-          )}
-
-          {/* Parsed Transaction - Large Cards */}
-          {parsedTransaction && !confirmationMessage && (
-            <div className="space-y-4 mb-4">
-              <div className={`p-4 sm:p-6 rounded-xl border-2 ${
-                parsedTransaction.type === 'income' 
-                  ? 'bg-green-50 border-green-300' 
-                  : 'bg-red-50 border-red-300'
-              }`}>
-                <div className="text-center mb-4">
-                  <span className="text-4xl sm:text-5xl">
-                    {parsedTransaction.type === 'income' ? '💰' : '💸'}
-                  </span>
-                  <p className={`text-lg font-bold mt-2 ${
-                    parsedTransaction.type === 'income' ? 'text-green-700' : 'text-red-700'
-                  }`}>
-                    {parsedTransaction.type === 'income' ? 'PEMASUKAN' : 'PENGELUARAN'}
-                  </p>
-                </div>
-                
-                <div className="text-center">
-                  <p className="text-3xl sm:text-4xl font-bold text-gray-900">
-                    Rp {parsedTransaction.amount.toLocaleString('id-ID')}
-                  </p>
-                  <p className="text-lg text-gray-700 mt-2">
-                    {parsedTransaction.description}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Kategori: {parsedTransaction.category}
-                  </p>
-                </div>
-              </div>
-
-              {/* Action Buttons - Large */}
-              <div className="flex gap-3">
-                <Button
-                  onClick={saveTransaction}
-                  isLoading={isProcessing}
-                  leftIcon={<Check className="w-5 h-5" />}
-                  className="flex-1 py-4 text-lg font-bold bg-green-600 hover:bg-green-700"
-                >
-                  ✓ Simpan
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={resetState}
-                  leftIcon={<X className="w-5 h-5" />}
-                  className="py-4 text-lg"
-                >
-                  Batal
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Confirmation Message */}
-          {confirmationMessage && (
-            <div className="bg-green-50 border-2 border-green-300 text-green-800 p-6 rounded-xl">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-10 h-10 text-white" />
-                </div>
-                <p className="text-xl font-bold mb-2">Berhasil! 🎉</p>
-                <p className="text-lg">{confirmationMessage}</p>
-                <Button
-                  variant="secondary"
-                  onClick={resetState}
-                  leftIcon={<RotateCcw className="w-5 h-5" />}
-                  className="mt-4 py-3 text-lg"
-                >
-                  Catat Lagi
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            <p className="text-xl font-bold text-green-800 mb-2">Berhasil</p>
+            <p className="text-green-700">{confirmationMessage}</p>
+            <button onClick={resetState} className="mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl mx-auto">
+              <RotateCcw className="w-5 h-5" /> Catat Lagi
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

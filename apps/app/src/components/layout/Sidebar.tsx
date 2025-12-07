@@ -161,8 +161,13 @@ export function Sidebar() {
             {menuItems.map((item) => {
               const isActive = !item.external && pathname === item.href;
               const LinkComponent = item.external ? 'a' : Link;
+              // Add userId to external URLs for cross-domain data access
+              const needsUserId = (item.label === 'Foto Struk' || item.label === 'Analisis') && profile?.uid;
+              const hrefWithUserId = needsUserId
+                ? `${item.href}?userId=${profile.uid}` 
+                : item.href;
               const linkProps = item.external 
-                ? { href: item.href, target: '_blank', rel: 'noopener noreferrer' }
+                ? { href: hrefWithUserId, target: '_blank', rel: 'noopener noreferrer' }
                 : { href: item.href };
               return (
                 <LinkComponent

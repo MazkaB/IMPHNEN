@@ -214,11 +214,6 @@ export default function SettingsPage() {
               <p className="text-sm text-blue-700 font-medium mb-1">Paket Langganan</p>
               <p className="text-xl font-bold text-blue-600">Premium</p>
             </div>
-
-            <div className="p-5 bg-gray-50 rounded-2xl border-2 border-gray-200">
-              <p className="text-sm text-gray-600 font-medium mb-1">User ID</p>
-              <p className="text-sm font-mono text-gray-500 break-all">{user?.uid || '-'}</p>
-            </div>
           </div>
 
           {/* Quick Actions */}

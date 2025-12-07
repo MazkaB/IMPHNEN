@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![NUSA AI Banner](https://via.placeholder.com/800x200/22c55e/ffffff?text=NUSA+AI+-+Digitalisasi+UMKM+Indonesia)
+🌾 **NUSA AI** - Platform Digitalisasi UMKM Indonesia
 
 **Platform SaaS berbasis AI untuk membantu UMKM Indonesia dalam pencatatan keuangan, digitalisasi dokumen, dan analisis bisnis.**
 
@@ -298,28 +298,33 @@ npm run dev:content   # http://localhost:3004
 
 ## 📸 Screenshots
 
-### Landing Page
-![Landing Page](https://via.placeholder.com/800x450/22c55e/ffffff?text=Landing+Page+Screenshot)
+> **Note:** Screenshots aplikasi dapat dilihat di video demo atau dengan menjalankan aplikasi secara lokal.
 
-### Login & Register
-![Auth Pages](https://via.placeholder.com/800x450/3b82f6/ffffff?text=Login+Register+Screenshot)
+### Fitur yang Dapat Dilihat:
 
-### Dashboard Insight
-![Dashboard](https://via.placeholder.com/800x450/8b5cf6/ffffff?text=Dashboard+Insight+Screenshot)
-
-### OCR Digitalisasi
-![OCR](https://via.placeholder.com/800x450/f59e0b/ffffff?text=OCR+Digitalisasi+Screenshot)
-
-### Content Creator
-![Content](https://via.placeholder.com/800x450/ec4899/ffffff?text=Content+Creator+Screenshot)
+| App | Fitur | URL |
+|-----|-------|-----|
+| Landing | Hero, Features, Pricing, FAQ | [nusa-landing-delta.vercel.app](https://nusa-landing-delta.vercel.app) |
+| Main App | Voice Recording, Dashboard, OCR | [nusa-app-khaki.vercel.app](https://nusa-app-khaki.vercel.app) |
+| Insight | Analytics Dashboard, Charts | [nusa-insight.vercel.app](https://nusa-insight.vercel.app) |
+| OCR | Document Scanner, AI Parsing | [nusa-ocr.vercel.app](https://nusa-ocr.vercel.app) |
+| Content | AI Content Generator | [nusa-content.vercel.app](https://nusa-content.vercel.app) |
 
 ---
 
 ## 🎬 Demo Video
 
-[![Demo Video](https://via.placeholder.com/800x450/ef4444/ffffff?text=Click+to+Watch+Demo+Video)](https://youtube.com/your-demo-video)
+> **Demo Video:** Link video demo akan ditambahkan setelah proses recording selesai.
 
-**Link Demo Video:** [YouTube - NUSA AI Demo](https://youtube.com/your-demo-video)
+### Live Demo URLs:
+
+| App | Production URL | Status |
+|-----|----------------|--------|
+| 🏠 Landing | https://nusa-landing-delta.vercel.app | ✅ Live |
+| 📱 Main App | https://nusa-app-khaki.vercel.app | ✅ Live |
+| 📊 Insight | https://nusa-insight.vercel.app | ✅ Live |
+| 📷 OCR | https://nusa-ocr.vercel.app | ✅ Live |
+| 🎨 Content | https://nusa-content.vercel.app | ✅ Live |
 
 ---
 

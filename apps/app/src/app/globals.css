@@ -2,179 +2,289 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   NUSA AI - Design System for Accessibility
+   Optimized for elderly and disabled users
+   ============================================ */
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 249, 250, 251;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 17, 24, 39;
-    --background-end-rgb: 31, 41, 55;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-
-/* Focus styles for accessibility */
-*:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Button base styles */
-.btn {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-}
-
-.btn-primary {
-  @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
-}
-
-.btn-secondary {
-  @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500;
-}
-
-.btn-danger {
-  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-}
-
-/* Card styles */
-.card {
-  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
-}
-
-/* Input styles */
-.input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
-}
-
-/* Voice recording animation */
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-.recording-pulse {
-  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-/* Loading spinner */
-.spinner {
-  @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary-600;
-}
-
-/* Typeform-style animations */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-in-from-top {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-in {
-  animation: fade-in 0.3s ease-out;
-}
-
-.fade-in {
-  animation: fade-in 0.3s ease-out;
-}
-
-.slide-in-from-top {
-  animation: slide-in-from-top 0.3s ease-out;
-}
-
-/* Scale utilities */
-.hover\:scale-102:hover {
-  transform: scale(1.02);
-}
-
-.active\:scale-98:active {
-  transform: scale(0.98);
-}
-
-/* Large touch targets for elderly users */
-@layer utilities {
-  .touch-target {
-    min-height: 48px;
-    min-width: 48px;
-  }
+  /* Primary Colors - Solid, High Contrast */
+  --color-primary: #1E40AF;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1E3A8A;
   
-  .touch-target-lg {
-    min-height: 56px;
-    min-width: 56px;
-  }
+  /* Semantic Colors */
+  --color-success: #059669;
+  --color-danger: #DC2626;
+  --color-warning: #D97706;
+  --color-info: #0891B2;
+  
+  /* Neutral Colors */
+  --color-white: #FFFFFF;
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-500: #6B7280;
+  --color-gray-700: #374151;
+  --color-gray-900: #111827;
+  
+  /* Typography */
+  --font-size-base: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 30px;
+  --font-size-3xl: 36px;
+  
+  /* Spacing */
+  --touch-target: 56px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
 }
 
-/* Smooth scrolling */
+/* Base Styles */
 html {
+  font-size: var(--font-size-base);
   scroll-behavior: smooth;
 }
 
-/* Better text rendering */
 body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
+/* Focus Styles - High Visibility */
+*:focus-visible {
+  outline: 4px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+/* Large Touch Targets */
+button, a, input, select, textarea {
+  min-height: var(--touch-target);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-500);
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+@layer utilities {
+  /* Touch Target Sizes */
+  .touch-target {
+    min-height: 56px;
+    min-width: 56px;
+  }
+  
+  .touch-target-lg {
+    min-height: 72px;
+    min-width: 72px;
+  }
+  
+  /* High Contrast Text */
+  .text-high-contrast {
+    color: var(--color-gray-900);
+    font-weight: 600;
+  }
+  
+  /* Card Styles */
   .card {
-    border-width: 2px;
+    background: var(--color-white);
+    border: 2px solid var(--color-gray-200);
+    border-radius: 16px;
+    padding: var(--spacing-lg);
+  }
+  
+  .card-elevated {
+    background: var(--color-white);
+    border: 2px solid var(--color-gray-200);
+    border-radius: 20px;
+    padding: var(--spacing-xl);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Button Base */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 24px;
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    min-height: var(--touch-target);
+  }
+  
+  .btn:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background: var(--color-primary-dark);
+  }
+  
+  .btn-success {
+    background: var(--color-success);
+    color: var(--color-white);
+    border: none;
+  }
+  
+  .btn-success:hover {
+    background: #047857;
+  }
+  
+  .btn-danger {
+    background: var(--color-danger);
+    color: var(--color-white);
+    border: none;
+  }
+  
+  .btn-outline {
+    background: var(--color-white);
+    color: var(--color-gray-700);
+    border: 2px solid var(--color-gray-300);
+  }
+  
+  .btn-outline:hover {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-400);
+  }
+  
+  /* Input Styles */
+  .input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: var(--font-size-lg);
+    border: 2px solid var(--color-gray-300);
+    border-radius: 12px;
+    background: var(--color-white);
+    transition: border-color 0.2s ease;
+  }
+  
+  .input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+  
+  /* Status Colors */
+  .status-success {
+    background: #ECFDF5;
+    border: 2px solid #A7F3D0;
+    color: #065F46;
+  }
+  
+  .status-danger {
+    background: #FEF2F2;
+    border: 2px solid #FECACA;
+    color: #991B1B;
+  }
+  
+  .status-warning {
+    background: #FFFBEB;
+    border: 2px solid #FDE68A;
+    color: #92400E;
+  }
+  
+  .status-info {
+    background: #ECFEFF;
+    border: 2px solid #A5F3FC;
+    color: #155E75;
+  }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================
+   High Contrast Mode Support
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #0000EE;
+    --color-success: #006400;
+    --color-danger: #8B0000;
+  }
+  
+  .card, .card-elevated {
+    border-width: 3px;
   }
   
   button, a {
-    border: 2px solid currentColor;
+    border: 3px solid currentColor;
+  }
+}
+
+/* ============================================
+   Reduced Motion Support
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

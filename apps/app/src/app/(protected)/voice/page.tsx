@@ -17,108 +17,109 @@ export default function VoicePage() {
   };
 
   return (
-    <div className="min-h-screen pb-8">
-      {/* Header with Back Button */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link 
-          href="/dashboard"
-          className="p-3 rounded-2xl bg-gray-100 hover:bg-gray-200 transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-600" />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
-              <Mic className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            <Link 
+              href="/dashboard"
+              className="p-2.5 sm:p-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+              aria-label="Kembali ke Dashboard"
+            >
+              <ArrowLeft className="w-5 sm:w-6 h-5 sm:h-6 text-gray-600" />
+            </Link>
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gray-900 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Mic className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Catat dengan Suara</h1>
+                <p className="text-sm text-gray-500 truncate">Bicara, AI akan mencatat</p>
+              </div>
             </div>
-            Catat dengan Suara
-          </h1>
-          <p className="text-gray-500 text-base sm:text-lg mt-1 ml-15">
-            Cukup bicara, AI akan mencatat untuk Anda
-          </p>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Success Toast */}
       {showSuccess && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top">
-          <div className="bg-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+          <div className="bg-gray-900 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
             <CheckCircle className="w-6 h-6" />
-            <span className="font-semibold text-lg">Transaksi berhasil disimpan!</span>
+            <span className="font-medium">Transaksi berhasil disimpan</span>
           </div>
         </div>
       )}
 
-      {/* Tips Section - Large & Clear for Elderly */}
-      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-6 sm:p-8 border-2 border-blue-200 mb-6">
-        <h3 className="font-bold text-blue-900 text-xl sm:text-2xl mb-4 flex items-center gap-2">
-          💡 Contoh Ucapan
-        </h3>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Tips Section */}
+        <section className="bg-white border border-gray-200 rounded-xl p-6">
+          <h2 className="font-bold text-gray-900 text-lg mb-4">Contoh Ucapan</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900">&quot;Jual bakso 50 ribu&quot;</p>
+                <p className="text-green-600 text-sm">Pemasukan</p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-gray-900 text-lg">&quot;Jual bakso 50 ribu&quot;</p>
-              <p className="text-green-600 font-medium">→ Pemasukan</p>
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <TrendingDown className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900">&quot;Beli tepung 30 ribu&quot;</p>
+                <p className="text-red-600 text-sm">Pengeluaran</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900">&quot;Terima uang 100 ribu&quot;</p>
+                <p className="text-green-600 text-sm">Pemasukan</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <TrendingDown className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900">&quot;Bayar listrik 200 ribu&quot;</p>
+                <p className="text-red-600 text-sm">Pengeluaran</p>
+              </div>
             </div>
           </div>
-          <div className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm">
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <TrendingDown className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <p className="font-bold text-gray-900 text-lg">&quot;Beli tepung 30 ribu&quot;</p>
-              <p className="text-red-600 font-medium">→ Pengeluaran</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="font-bold text-gray-900 text-lg">&quot;Terima uang 100 ribu&quot;</p>
-              <p className="text-green-600 font-medium">→ Pemasukan</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm">
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <TrendingDown className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <p className="font-bold text-gray-900 text-lg">&quot;Bayar listrik 200 ribu&quot;</p>
-              <p className="text-red-600 font-medium">→ Pengeluaran</p>
-            </div>
-          </div>
+        </section>
+
+        {/* Voice Recorder */}
+        <section className="max-w-lg mx-auto">
+          <VoiceRecorder onTransactionSaved={handleTransactionSaved} autoSave={false} />
+        </section>
+
+        {/* Recent Transactions */}
+        {refreshKey > 0 && (
+          <section className="bg-white border border-gray-200 rounded-xl p-6">
+            <h2 className="font-bold text-gray-900 text-lg mb-4">Catatan Terakhir</h2>
+            <TransactionList key={refreshKey} limit={5} showActions={false} />
+          </section>
+        )}
+
+        {/* Back to Dashboard */}
+        <div className="text-center pt-4">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-3 px-6 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-colors"
+          >
+            <Home className="w-5 h-5" />
+            Kembali ke Dashboard
+          </Link>
         </div>
-      </div>
-
-      {/* Voice Recorder - Centered and Large */}
-      <div className="max-w-lg mx-auto mb-8">
-        <VoiceRecorder onTransactionSaved={handleTransactionSaved} autoSave={false} />
-      </div>
-
-      {/* Recent Transactions */}
-      {refreshKey > 0 && (
-        <div className="bg-white rounded-3xl border-2 border-gray-100 p-4 sm:p-6 shadow-sm mb-6">
-          <h3 className="font-bold text-gray-900 text-xl mb-4 flex items-center gap-2">
-            📝 Catatan Terakhir
-          </h3>
-          <TransactionList key={refreshKey} limit={5} showActions={false} />
-        </div>
-      )}
-
-      {/* Back to Dashboard CTA */}
-      <div className="text-center">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-3 px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-colors text-lg"
-        >
-          <Home className="w-6 h-6" />
-          Kembali ke Dashboard
-        </Link>
-      </div>
+      </main>
     </div>
   );
 }

@@ -32,8 +32,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const result = await handleGoogleRedirectResult();
         if (result) {
-          console.log('Google redirect handled, user:', result.user.email);
-          // Save profile immediately after redirect
           await saveUserProfileIfNotExists(result.user);
         }
       } catch (error) {

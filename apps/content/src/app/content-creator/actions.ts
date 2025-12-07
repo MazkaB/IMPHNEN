@@ -19,8 +19,7 @@ export async function generateContent(inputType: string, data: string, originalP
         }
 
         const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const caption = response.text();
+        const caption = result.response.text();
 
         // 2. Generate Image (Visual) using Gemini Image
 
@@ -66,56 +65,70 @@ export async function generateContent(inputType: string, data: string, originalP
             imagePrompt = `A professional flat lay poster photograph from directly above, focusing on ${productName}. ${textInstruction} A prominent, stylish sale tag or sticker is placed on or next to the product. The tag clearly shows the original price '${priceStr}' with a strikethrough (crossed out), highlights the discount '${discountStr}', AND prominently displays the FINAL PRICE '${finalPriceStr}' nearby. ${baseStyle}`;
         }
 
-        console.log("Generated Image Prompt:", imagePrompt);
-
-        // Initialize Image Model
+        // Gemini 2.5 Flash Models:
+        // - gemini-2.5-flash: Standard model for text generation  
+        // - gemini-2.5-flash-image: Stable model for image generation (supports image input/output)
+        // Using gemini-2.5-flash-image for image generation
         const imageModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" });
 
         let imageUrl = "";
-        let retryCount = 0;
-        const maxRetries = 2;
+        let lastError: Error | null = null;
+        const maxRetries = 3;
 
-        while (retryCount < maxRetries) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                console.log(`Attempting image generation (Try ${retryCount + 1}/${maxRetries})...`);
-
-                // Generate Image with the constructed prompt
+                console.log(`Gemini Image Generation Attempt ${attempt}/${maxRetries}`);
+                
+                // Generate Image with Gemini - NO FALLBACK
                 const imageGenResult = await imageModel.generateContent({
                     contents: [{ role: "user", parts: [{ text: imagePrompt }] }],
+                    generationConfig: {
+                        responseModalities: ["image", "text"],
+                    } as any,
                 });
-                const imageResponse = await imageGenResult.response;
+                const imageResponse = imageGenResult.response;
 
-                const candidates = await imageResponse.candidates;
-                if (candidates && candidates.length > 0) {
+                const candidates = imageResponse.candidates;
+                if (candidates && candidates.length > 0 && candidates[0].content?.parts) {
                     const parts = candidates[0].content.parts;
 
-                    // Find the part with inlineData
+                    // Find the part with inlineData (image)
                     const imagePart = parts.find((p: any) => p.inlineData);
 
-                    if (imagePart && imagePart.inlineData) {
-                        imageUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-                        break; // Success, exit loop
+                    if (imagePart && (imagePart as any).inlineData) {
+                        const inlineData = (imagePart as any).inlineData;
+                        imageUrl = `data:${inlineData.mimeType};base64,${inlineData.data}`;
+                        console.log("Gemini image generated successfully");
+                        break; // Success
                     } else {
-                        console.log("No inlineData found in any part.");
-                        throw new Error("No image data returned by Gemini.");
+                        throw new Error("Gemini tidak mengembalikan data gambar. Coba lagi.");
                     }
+                } else {
+                    throw new Error("Gemini tidak mengembalikan response. Coba lagi.");
                 }
-            } catch (imgErr) {
-                console.error(`Gemini Image Generation Failed (Attempt ${retryCount + 1}):`, imgErr);
-                retryCount++;
-                if (retryCount === maxRetries) {
-                    throw imgErr; // Throw if last attempt failed
+            } catch (imgErr: any) {
+                lastError = imgErr;
+                console.error(`Gemini Image Generation Failed (Attempt ${attempt}):`, imgErr?.message || imgErr);
+                
+                if (attempt < maxRetries) {
+                    // Wait before retry (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
                 }
-                // Wait a bit before retrying
-                await new Promise(resolve => setTimeout(resolve, 1000));
             }
+        }
+
+        // If all retries failed, return error - NO FALLBACK
+        if (!imageUrl) {
+            return {
+                success: false,
+                error: `Gagal generate gambar setelah ${maxRetries} percobaan. ${lastError?.message || 'Silakan coba lagi.'}`,
+            };
         }
 
         return {
             success: true,
             caption,
-            imageUrl: imageUrl,
-            unsplashUrl: imageUrl
+            imageUrl,
         };
     } catch (error) {
         console.error("Error generating content:", error);

@@ -216,8 +216,6 @@ export const checkUserSubscription = async (uid: string): Promise<boolean> => {
       const userData = userSnap.data();
       const subscription = userData.subscription;
       
-      console.log('Checking subscription for user:', uid, JSON.stringify(subscription));
-      
       if (!subscription) return false;
       
       // If subscription has status 'active' or has promoCode, check expiry
@@ -225,7 +223,6 @@ export const checkUserSubscription = async (uid: string): Promise<boolean> => {
         // Check expiry if exists
         if (subscription.expiresAt) {
           const expiryDate = toDate(subscription.expiresAt);
-          console.log('Expiry date:', expiryDate, 'Now:', new Date());
           if (expiryDate && expiryDate > new Date()) {
             return true;
           }
@@ -238,10 +235,8 @@ export const checkUserSubscription = async (uid: string): Promise<boolean> => {
       
       return false;
     }
-    console.log('User document not found:', uid);
     return false;
-  } catch (error) {
-    console.error('Error checking subscription:', error);
+  } catch {
     return false;
   }
 };

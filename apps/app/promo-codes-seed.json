@@ -1,7 +1,7 @@
 {
   "promoCodes": {
-    "NUSA2024": {
-      "code": "NUSA2024",
+    "NUSA2025": {
+      "code": "NUSA2025",
       "plan": "pro",
       "durationDays": 30,
       "maxUses": 100,
@@ -27,8 +27,8 @@
       "isActive": true,
       "createdAt": { "_seconds": 1733468400, "_nanoseconds": 0 }
     },
-    "UMKM2024": {
-      "code": "UMKM2024",
+    "UMKM2025": {
+      "code": "UMKM2025",
       "plan": "basic",
       "durationDays": 30,
       "maxUses": 500,

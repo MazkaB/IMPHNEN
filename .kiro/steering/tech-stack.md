@@ -1,6 +1,6 @@
 # Tech Stack Guidelines
 
-## Current Versions (December 2024)
+## Current Versions (December 2025)
 
 ### Core Framework
 - **Next.js**: 15.1.3 (App Router)

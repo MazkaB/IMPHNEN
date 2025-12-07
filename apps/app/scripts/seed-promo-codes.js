@@ -14,7 +14,7 @@ const db = getFirestore();
 
 const promoCodes = [
   {
-    code: 'NUSA2024',
+    code: 'NUSA2025',
     plan: 'pro',
     durationDays: 30,
     maxUses: 100,
@@ -38,7 +38,7 @@ const promoCodes = [
     isActive: true,
   },
   {
-    code: 'UMKM2024',
+    code: 'UMKM2025',
     plan: 'basic',
     durationDays: 30,
     maxUses: 500,

@@ -1,17 +1,27 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
-export default function InsightHomePage() {
+function RedirectContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Redirect to dashboard
-    router.push('/dashboard');
-  }, [router]);
+    // Pass userId from URL params if available
+    const userId = searchParams.get('userId');
+    if (userId) {
+      router.push(`/dashboard?userId=${userId}`);
+    } else {
+      router.push('/dashboard');
+    }
+  }, [router, searchParams]);
 
+  return null;
+}
+
+export default function InsightHomePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
       <div className="text-center">
@@ -21,6 +31,9 @@ export default function InsightHomePage() {
         <Loader2 className="w-8 h-8 animate-spin text-purple-600 mx-auto" />
         <p className="mt-4 text-gray-600 text-lg">Memuat Analisis...</p>
       </div>
+      <Suspense fallback={null}>
+        <RedirectContent />
+      </Suspense>
     </div>
   );
 }

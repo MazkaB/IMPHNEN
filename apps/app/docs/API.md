@@ -33,8 +33,8 @@ Mengambil daftar transaksi user.
       "category": "Penjualan Produk",
       "source": "voice",
       "rawInput": "jual bakso 10 porsi 15 ribu",
-      "createdAt": "2024-01-15T10:30:00Z",
-      "updatedAt": "2024-01-15T10:30:00Z"
+      "createdAt": "2025-01-15T10:30:00Z",
+      "updatedAt": "2025-01-15T10:30:00Z"
     }
   ]
 }

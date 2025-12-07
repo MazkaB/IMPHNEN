@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminFirebase } from '@/lib/firebase/admin';
 import {
-  saveTransaction,
-  getUserTransactions,
-  getTransactionSummary,
-} from '@/lib/firebase/transaction-service';
+  saveTransactionAdmin,
+  getUserTransactionsAdmin,
+  getTransactionSummaryAdmin,
+} from '@/lib/firebase/transaction-service-admin';
 import { z } from 'zod';
 
 // Schema validasi untuk create transaction
@@ -54,11 +54,11 @@ export async function GET(request: NextRequest) {
     const summaryOnly = searchParams.get('summary') === 'true';
 
     if (summaryOnly) {
-      const summary = await getTransactionSummary(userId);
+      const summary = await getTransactionSummaryAdmin(userId);
       return NextResponse.json({ success: true, data: summary });
     }
 
-    const transactions = await getUserTransactions(
+    const transactions = await getUserTransactionsAdmin(
       userId,
       limitParam ? parseInt(limitParam, 10) : 100
     );
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       userId,
     };
 
-    const transactionId = await saveTransaction(transactionData);
+    const transactionId = await saveTransactionAdmin(transactionData);
 
     return NextResponse.json({
       success: true,
