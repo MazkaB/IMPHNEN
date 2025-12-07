@@ -1,8 +1,10 @@
-# 🌾 NUSA AI - Platform Digitalisasi UMKM Indonesia
+# NUSA AI - Platform Digitalisasi UMKM Indonesia
 
 <div align="center">
 
-🌾 **NUSA AI** - Platform Digitalisasi UMKM Indonesia
+**NUSA AI** - Platform Digitalisasi UMKM Indonesia
+
+![Uploading image.png…]()
 
 **Platform SaaS berbasis AI untuk membantu UMKM Indonesia dalam pencatatan keuangan, digitalisasi dokumen, dan analisis bisnis.**
 
