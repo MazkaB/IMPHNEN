@@ -5,6 +5,20 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { Product } from '@/types/product';
 import { Transaction } from '@/types/transaction';
 import { AccountReceivable, AccountPayable } from '@/types/analytics';
+import { db } from '@/lib/firebase/config';
+import { 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  onSnapshot, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  serverTimestamp,
+  Timestamp 
+} from 'firebase/firestore';
 
 interface DashboardContextType {
   products: Product[];
@@ -21,35 +35,17 @@ interface DashboardContextType {
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
-const getStorageKeys = (userId: string) => ({
-  PRODUCTS: `dashboard_products_${userId}`,
-  TRANSACTIONS: `dashboard_transactions_${userId}`,
-});
-
-function getFromStorage<T>(userId: string, key: 'PRODUCTS' | 'TRANSACTIONS'): T[] {
-  try {
-    const storageKey = getStorageKeys(userId)[key];
-    const data = localStorage.getItem(storageKey);
-    return data
-      ? JSON.parse(data, (k, value) => {
-          if (k === 'date' || k === 'createdAt' || k === 'updatedAt') {
-            return new Date(value);
-          }
-          return value;
-        })
-      : [];
-  } catch {
-    return [];
+function convertTimestamp(timestamp: unknown): Date {
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
   }
-}
-
-function saveToStorage<T>(userId: string, key: 'PRODUCTS' | 'TRANSACTIONS', data: T[]): void {
-  try {
-    const storageKey = getStorageKeys(userId)[key];
-    localStorage.setItem(storageKey, JSON.stringify(data));
-  } catch {
-    // Silent fail for localStorage errors
+  if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp) {
+    return (timestamp as { toDate: () => Date }).toDate();
   }
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  return new Date(timestamp as string | number);
 }
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
@@ -60,85 +56,145 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [payables, setPayables] = useState<AccountPayable[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Subscribe to transactions from Firebase
   useEffect(() => {
-    if (!user?.uid) {
-      setProducts([]);
+    if (!user?.uid || !db) {
       setTransactions([]);
       setLoading(false);
       return;
     }
 
-    const storedProducts = getFromStorage<Product>(user.uid, 'PRODUCTS');
-    const storedTransactions = getFromStorage<Transaction>(user.uid, 'TRANSACTIONS');
+    setLoading(true);
 
-    setProducts(storedProducts);
-    setTransactions(storedTransactions);
-    setLoading(false);
+    // Query transactions collection (same as apps/app)
+    const q = query(
+      collection(db, 'transactions'),
+      where('userId', '==', user.uid),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const txData: Transaction[] = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data();
+          const createdAt = data.createdAt ? convertTimestamp(data.createdAt) : new Date();
+          
+          // Map from apps/app Transaction format to insight Transaction format
+          return {
+            id: docSnap.id,
+            userId: data.userId || user.uid,
+            date: createdAt,
+            time: createdAt.toLocaleTimeString('id-ID'),
+            product: data.description || 'Produk',
+            productId: data.productId || docSnap.id,
+            quantity: data.quantity || 1,
+            pricePerItem: data.amount || 0,
+            totalAmount: data.amount || 0,
+            costPerItem: data.type === 'expense' ? data.amount : 0,
+            source: (data.source as 'voice' | 'ocr' | 'manual') || 'manual',
+            customer: data.category || '',
+            createdAt: createdAt,
+            updatedAt: data.updatedAt ? convertTimestamp(data.updatedAt) : createdAt,
+            // Additional fields for analytics
+            type: data.type, // 'income' or 'expense'
+            amount: data.amount,
+            description: data.description,
+            category: data.category,
+          } as Transaction;
+        });
+        setTransactions(txData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching transactions:', error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user?.uid]);
+
+  // Subscribe to products from Firebase
+  useEffect(() => {
+    if (!user?.uid || !db) {
+      setProducts([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'products'),
+      where('userId', '==', user.uid),
+      orderBy('name', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const prodData: Product[] = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            ...data,
+            createdAt: data.createdAt ? convertTimestamp(data.createdAt) : new Date(),
+            updatedAt: data.updatedAt ? convertTimestamp(data.updatedAt) : new Date(),
+          } as Product;
+        });
+        setProducts(prodData);
+      },
+      (error) => {
+        console.error('Error fetching products:', error);
+      }
+    );
+
+    return () => unsubscribe();
   }, [user?.uid]);
 
   const addProduct = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user?.uid) throw new Error('User must be logged in');
+    if (!user?.uid || !db) throw new Error('User must be logged in');
 
-    const nextNumber = products.length + 1;
-    const paddedNumber = String(nextNumber).padStart(4, '0');
-    const newProduct: Product = {
-      id: `PROD-${paddedNumber}`,
+    const docRef = await addDoc(collection(db, 'products'), {
       ...productData,
       userId: user.uid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
-    const updatedProducts = [newProduct, ...products];
-    setProducts(updatedProducts);
-    saveToStorage(user.uid, 'PRODUCTS', updatedProducts);
-
-    return newProduct.id;
+    return docRef.id;
   };
 
   const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user?.uid) throw new Error('User must be logged in');
+    if (!user?.uid || !db) throw new Error('User must be logged in');
 
-    const nextNumber = transactions.length + 1;
-    const paddedNumber = String(nextNumber).padStart(4, '0');
-    const newTransaction: Transaction = {
-      id: `TRX-${paddedNumber}`,
+    const docRef = await addDoc(collection(db, 'transactions'), {
       ...transactionData,
       userId: user.uid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
-    const updatedTransactions = [newTransaction, ...transactions];
-    setTransactions(updatedTransactions);
-    saveToStorage(user.uid, 'TRANSACTIONS', updatedTransactions);
-
-    return newTransaction.id;
+    return docRef.id;
   };
 
   const updateProduct = async (id: string, productData: Partial<Product>) => {
-    if (!user?.uid) throw new Error('User must be logged in');
+    if (!user?.uid || !db) throw new Error('User must be logged in');
 
-    const updatedProducts = products.map((p) => (p.id === id ? { ...p, ...productData, updatedAt: new Date() } : p));
-    setProducts(updatedProducts);
-    saveToStorage(user.uid, 'PRODUCTS', updatedProducts);
+    const productRef = doc(db, 'products', id);
+    await updateDoc(productRef, {
+      ...productData,
+      updatedAt: serverTimestamp(),
+    });
   };
 
   const deleteProduct = async (id: string) => {
-    if (!user?.uid) throw new Error('User must be logged in');
+    if (!user?.uid || !db) throw new Error('User must be logged in');
 
-    const updatedProducts = products.filter((p) => p.id !== id);
-    setProducts(updatedProducts);
-    saveToStorage(user.uid, 'PRODUCTS', updatedProducts);
+    const productRef = doc(db, 'products', id);
+    await deleteDoc(productRef);
   };
 
   const refreshData = () => {
-    if (!user?.uid) return;
-
-    const storedProducts = getFromStorage<Product>(user.uid, 'PRODUCTS');
-    const storedTransactions = getFromStorage<Transaction>(user.uid, 'TRANSACTIONS');
-    setProducts(storedProducts);
-    setTransactions(storedTransactions);
+    // Data is automatically refreshed via onSnapshot listeners
   };
 
   return (
