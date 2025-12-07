@@ -328,7 +328,7 @@ npm run dev:content   # http://localhost:3004
 
 ## 🎬 Demo Video
 
-> **Demo Video:** Link video demo akan ditambahkan setelah proses recording selesai.
+> **Demo Video:** https://youtu.be/Qw-bz9d_R88
 
 ### Live Demo URLs:
 
